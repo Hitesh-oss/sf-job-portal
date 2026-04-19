@@ -1,18 +1,23 @@
-# Salesforce DX Project: Next Steps
+# SF Job Portal - Salesforce Full Stack Project
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+## Project Description
+A complete Job Portal built on Salesforce platform.
+Job seekers can apply for jobs, employers can post jobs,
+and admins can manage everything.
 
-## How Do You Plan to Deploy Your Changes?
+## Tech Stack
+- Frontend: Lightning Web Components (LWC)
+- Backend: Apex Classes + Triggers
+- Database: Salesforce Custom Objects
+- Automation: Flows + Approval Process
+- Integration: REST API
 
-Do you want to deploy a set of changes, or create a self-contained application? Choose a [development model](https://developer.salesforce.com/tools/vscode/en/user-guide/development-models).
+## Status
+Day 1/90 - Setup complete
 
-## Configure Your Salesforce DX Project
+## 90-Day Challenge
+Building this project as part of #90DayChallenge
+Daily GitHub commits + LinkedIn updates
 
-The `sfdx-project.json` file contains useful configuration information for your project. See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm) in the _Salesforce DX Developer Guide_ for details about this file.
-
-## Read All About It
-
-- [Salesforce Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
-- [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_intro.htm)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+## Author
+[HITESH KUMAR GARNAYAK ] | Salesforce Developer
