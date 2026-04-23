@@ -9,6 +9,14 @@
                     <p><strong>Location:</strong> {job.Location__c}</p>
                     <p><strong>Type:</strong> {job.Job_Type__c}</p>
                     <p><strong>Salary:</strong> {job.Salary_Range__c}</p>
+
+                    <lightning-button
+                        label="Apply"
+                        variant="brand"
+                        data-id={job.Id}
+                        onclick={handleApply}
+                        class="slds-m-top_small">
+                    </lightning-button>
                 </div>
             </template>
         </template>

@@ -8,4 +8,12 @@ public with sharing class JobPortalController {
             ORDER BY CreatedDate DESC
         ];
     }
+
+    @AuraEnabled
+    public static void createApplication(Id jobId) {
+        Application__c app = new Application__c();
+        app.Job__c = jobId;
+        app.Application_Status__c = 'Applied';
+        insert app;
+    }
 }
