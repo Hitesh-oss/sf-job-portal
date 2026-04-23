@@ -1,0 +1,22 @@
+<template>
+    <lightning-card title="Job Listings" icon-name="standard:jobs">
+        <template if:true={jobs}>
+            <template for:each={jobs} for:item="job">
+                <div key={job.Id} class="slds-box slds-m-around_small">
+                    <p><strong>Name:</strong> {job.Name}</p>
+                    <p><strong>Title:</strong> {job.Job_Title__c}</p>
+                    <p><strong>Company:</strong> {job.Company__c}</p>
+                    <p><strong>Location:</strong> {job.Location__c}</p>
+                    <p><strong>Type:</strong> {job.Job_Type__c}</p>
+                    <p><strong>Salary:</strong> {job.Salary_Range__c}</p>
+                </div>
+            </template>
+        </template>
+
+        <template if:true={error}>
+            <p class="slds-text-color_error slds-m-around_small">
+                Error loading jobs.
+            </p>
+        </template>
+    </lightning-card>
+</template>
