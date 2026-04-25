@@ -7,6 +7,12 @@ export default class JobList extends LightningElement {
     jobs;
     error;
 
+    showForm = false;
+    selectedJobId;
+    candidateId = '';
+    resumeUrl = '';
+    coverLetter = '';
+
     @wire(getAllJobs)
     wiredJobs({ error, data }) {
         if (data) {
@@ -19,24 +25,53 @@ export default class JobList extends LightningElement {
     }
 
     handleApply(event) {
-        const jobId = event.target.dataset.id;
+        this.selectedJobId = event.target.dataset.id;
+        this.showForm = true;
+    }
 
-        createApplication({ jobId: jobId })
+    handleCandidateChange(event) {
+        this.candidateId = event.target.value;
+    }
+
+    handleResumeChange(event) {
+        this.resumeUrl = event.target.value;
+    }
+
+    handleCoverChange(event) {
+        this.coverLetter = event.target.value;
+    }
+
+    submitApplication() {
+        createApplication({
+            jobId: this.selectedJobId,
+            candidateId: this.candidateId,
+            resumeUrl: this.resumeUrl,
+            coverLetter: this.coverLetter
+        })
             .then(() => {
+                this.showForm = false;
+
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Success',
-                        message: 'Application Submitted!',
+                        message: 'Application Submitted Successfully!',
                         variant: 'success'
                     })
                 );
             })
             .catch(error => {
-                console.error(error);
+                console.error('Full Error:', JSON.stringify(error));
+
+                let message = 'Application submit nahi hua';
+
+                if (error && error.body && error.body.message) {
+                    message = error.body.message;
+                }
+
                 this.dispatchEvent(
                     new ShowToastEvent({
                         title: 'Error',
-                        message: 'Application failed',
+                        message: message,
                         variant: 'error'
                     })
                 );

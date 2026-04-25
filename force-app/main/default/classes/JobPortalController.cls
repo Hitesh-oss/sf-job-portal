@@ -10,10 +10,22 @@ public with sharing class JobPortalController {
     }
 
     @AuraEnabled
-    public static void createApplication(Id jobId) {
+    public static void createApplication(Id jobId, String candidateId, String resumeUrl, String coverLetter) {
+        if (jobId == null) {
+            throw new AuraHandledException('Job Id missing');
+        }
+
         Application__c app = new Application__c();
         app.Job__c = jobId;
+
+        if (String.isNotBlank(candidateId)) {
+            app.Candidate__c = candidateId;
+        }
+
+        app.Resume_URL__c = resumeUrl;
+        app.Cover_Letter__c = coverLetter;
         app.Application_Status__c = 'Applied';
+
         insert app;
     }
 }
