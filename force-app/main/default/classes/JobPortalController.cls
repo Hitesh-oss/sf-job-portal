@@ -10,16 +10,20 @@ public with sharing class JobPortalController {
     }
 
     @AuraEnabled
-    public static void createApplication(Id jobId, String candidateId, String resumeUrl, String coverLetter) {
+    public static void createApplication(Id jobId, String resumeUrl, String coverLetter) {
+
         if (jobId == null) {
             throw new AuraHandledException('Job Id missing');
         }
 
+        // 🔥 Logged-in user ka Contact auto fetch
+        User u = [SELECT ContactId FROM User WHERE Id = :UserInfo.getUserId()];
+
         Application__c app = new Application__c();
         app.Job__c = jobId;
 
-        if (String.isNotBlank(candidateId)) {
-            app.Candidate__c = candidateId;
+        if (u.ContactId != null) {
+            app.Candidate__c = u.ContactId;
         }
 
         app.Resume_URL__c = resumeUrl;

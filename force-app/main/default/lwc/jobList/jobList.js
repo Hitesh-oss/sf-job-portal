@@ -9,7 +9,6 @@ export default class JobList extends LightningElement {
 
     showForm = false;
     selectedJobId;
-    candidateId = '';
     resumeUrl = '';
     coverLetter = '';
 
@@ -29,10 +28,6 @@ export default class JobList extends LightningElement {
         this.showForm = true;
     }
 
-    handleCandidateChange(event) {
-        this.candidateId = event.target.value;
-    }
-
     handleResumeChange(event) {
         this.resumeUrl = event.target.value;
     }
@@ -44,12 +39,13 @@ export default class JobList extends LightningElement {
     submitApplication() {
         createApplication({
             jobId: this.selectedJobId,
-            candidateId: this.candidateId,
             resumeUrl: this.resumeUrl,
             coverLetter: this.coverLetter
         })
             .then(() => {
                 this.showForm = false;
+                this.resumeUrl = '';
+                this.coverLetter = '';
 
                 this.dispatchEvent(
                     new ShowToastEvent({
@@ -60,7 +56,7 @@ export default class JobList extends LightningElement {
                 );
             })
             .catch(error => {
-                console.error('Full Error:', JSON.stringify(error));
+                console.error(error);
 
                 let message = 'Application submit nahi hua';
 
