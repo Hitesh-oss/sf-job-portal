@@ -358,9 +358,6 @@
 }
 
 /* Sidebar & Panels */
-.dashboard-layout {
-  /* Using slds-gutters instead of gap to prevent overflow */
-}
 
 .dashboard-sidebar {
   position: sticky;
@@ -455,9 +452,10 @@
 }
 
 /* Base Adjustments */
-.lightning-card {
+.job-portal-container {
   border-radius: 1.5rem;
   border: none;
+  background: #ffffff;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
 }
 

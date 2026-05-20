@@ -152,7 +152,8 @@ export default class JobList extends LightningElement {
     const metrics = this.activityMetrics;
     this.displayMetrics = metrics.map((metric) => ({
       ...metric,
-      displayValue: metric.value
+      displayValue: metric.value,
+      styleExpression: `width: ${metric.percentage}%`
     }));
     this.animationComplete = true;
   }

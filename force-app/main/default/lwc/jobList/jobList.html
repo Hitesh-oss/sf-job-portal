@@ -1,5 +1,5 @@
 <template>
-  <lightning-card title="Job Portal Dashboard" icon-name="standard:jobs">
+  <div class="slds-card job-portal-container slds-p-around_medium">
     <!-- Advanced Header Section -->
     <div class="advanced-header slds-p-around_medium">
       <div class="header-top slds-m-bottom_medium">
@@ -61,7 +61,7 @@
     </div>
 
     <div
-      class="slds-grid slds-wrap slds-gutters_large dashboard-layout slds-m-top_large"
+      class="slds-grid slds-wrap slds-gutters dashboard-layout slds-m-top_large"
     >
       <aside
         class="dashboard-sidebar slds-col slds-size_1-of-1 slds-large-size_1-of-4"
@@ -161,7 +161,7 @@
                 <div class="progress-bar">
                   <div
                     class="progress-fill"
-                    data-percentage={metric.percentage}
+                    style={metric.styleExpression}
                   ></div>
                 </div>
                 <p class="slds-text-body_small activity-percent">
@@ -406,5 +406,5 @@
       </div>
       <div class="slds-backdrop slds-backdrop_open"></div>
     </template>
-  </lightning-card>
+  </div>
 </template>
