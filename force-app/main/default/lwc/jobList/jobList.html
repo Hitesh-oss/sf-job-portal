@@ -29,7 +29,7 @@
     <template if:true={isLoading}>
       <div class="slds-p-around_medium">
         <lightning-spinner
-          alternative-text="Loading jobs..."
+          alternative-text="Loading..."
           size="medium"
         ></lightning-spinner>
       </div>
@@ -60,7 +60,9 @@
       </div>
     </div>
 
+    <!-- Main Workspace Grid -->
     <div class="slds-grid slds-wrap dashboard-layout">
+      <!-- Sidebar Panel: Search & Filters -->
       <aside
         class="dashboard-sidebar slds-col slds-size_1-of-1 slds-large-size_1-of-4"
       >
@@ -171,177 +173,398 @@
         </div>
       </aside>
 
+      <!-- Main Panel: Tabbed Workspaces -->
       <section
         class="dashboard-main slds-col slds-size_1-of-1 slds-large-size_3-of-4"
       >
-        <template if:true={jobs}>
-          <div
-            class="slds-box slds-theme_shade slds-m-horizontal_medium slds-m-bottom_medium job-summary sticky-summary"
-          >
-            <div class="slds-grid slds-grid_align-spread slds-align-top">
-              <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
-                <p class="slds-text-heading_small">
-                  {filteredJobs.length} Jobs Matching Your Search
-                </p>
-                <p class="slds-text-body_small slds-text-color_weak">
-                  Use filters to narrow the list and find the right role fast.
-                </p>
-              </div>
-              <div
-                class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-text-align_right"
+        <!-- Custom Navigation Tabs -->
+        <div class="custom-tab-container slds-m-horizontal_medium">
+          <ul class="custom-tab-list">
+            <li class={activeJobsTabClass}>
+              <a
+                class="custom-tab-link"
+                href="#"
+                onclick={handleTabChange}
+                data-tab="jobs"
+                >Explore Jobs</a
               >
-                <template if:true={searchTerm}>
-                  <span class="slds-text-body_small"
-                    >Search: <strong>{searchTerm}</strong></span
-                  >
-                </template>
-                <template if:true={selectedJobType}>
-                  <span class="slds-text-body_small slds-m-left_small"
-                    >Type: <strong>{selectedJobType}</strong></span
-                  >
-                </template>
-                <template if:true={selectedLocation}>
-                  <span class="slds-text-body_small slds-m-left_small"
-                    >Location: <strong>{selectedLocation}</strong></span
-                  >
-                </template>
+            </li>
+            <li class={activeApplicationsTabClass}>
+              <a
+                class="custom-tab-link"
+                href="#"
+                onclick={handleTabChange}
+                data-tab="applications"
+                >My Applications</a
+              >
+            </li>
+          </ul>
+        </div>
+
+        <!-- Tab 1: Explore Jobs -->
+        <template if:true={isJobsTabActive}>
+          <template if:true={jobs}>
+            <div
+              class="slds-box slds-theme_shade slds-m-horizontal_medium slds-m-bottom_medium job-summary sticky-summary"
+            >
+              <div class="slds-grid slds-grid_align-spread slds-align-top">
+                <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-2">
+                  <p class="slds-text-heading_small">
+                    {filteredJobs.length} Jobs Matching Your Search
+                  </p>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                    Use filters to narrow the list and find the right role fast.
+                  </p>
+                </div>
+                <div
+                  class="slds-col slds-size_1-of-1 slds-large-size_1-of-2 slds-text-align_right"
+                >
+                  <template if:true={searchTerm}>
+                    <span class="slds-text-body_small"
+                      >Search: <strong>{searchTerm}</strong></span
+                    >
+                  </template>
+                  <template if:true={selectedJobType}>
+                    <span class="slds-text-body_small slds-m-left_small"
+                      >Type: <strong>{selectedJobType}</strong></span
+                    >
+                  </template>
+                  <template if:true={selectedLocation}>
+                    <span class="slds-text-body_small slds-m-left_small"
+                      >Location: <strong>{selectedLocation}</strong></span
+                    >
+                  </template>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="slds-p-horizontal_medium slds-p-bottom_small">
-            <span class="slds-text-body_small slds-text-color_weak">
-              Showing {paginatedJobs.length} of {filteredJobs.length} jobs
-            </span>
-          </div>
+            <div class="slds-p-horizontal_medium slds-p-bottom_small">
+              <span class="slds-text-body_small slds-text-color_weak">
+                Showing {paginatedJobs.length} of {filteredJobs.length} jobs
+              </span>
+            </div>
 
-          <template if:true={paginatedJobs.length}>
-            <template for:each={paginatedJobs} for:item="job">
-              <div
-                key={job.Id}
-                class="slds-box slds-m-horizontal_medium slds-m-bottom_small job-card"
-              >
-                <div class="slds-grid slds-gutters">
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-large-size_8-of-12"
-                  >
+            <template if:true={paginatedJobs.length}>
+              <template for:each={paginatedJobs} for:item="job">
+                <div
+                  key={job.Id}
+                  class="slds-box slds-m-horizontal_medium slds-m-bottom_small job-card"
+                >
+                  <div class="slds-grid slds-gutters slds-wrap">
                     <div
-                      class="slds-grid slds-grid_align-spread slds-align-top slds-m-bottom_x-small job-meta"
+                      class="slds-col slds-size_1-of-1 slds-large-size_8-of-12"
                     >
-                      <h3
-                        class="slds-text-heading_small slds-m-bottom_x-small slds-truncate"
-                        title={job.Job_Title__c}
+                      <div
+                        class="slds-grid slds-grid_align-spread slds-align-top slds-m-bottom_x-small job-meta"
                       >
-                        <a
-                          href="#"
-                          onclick={handleJobClick}
-                          data-id={job.Id}
-                          class="job-title-link"
+                        <h3
+                          class="slds-text-heading_small slds-m-bottom_x-small slds-truncate"
+                          title={job.Job_Title__c}
                         >
-                          {job.Job_Title__c}
-                        </a>
-                      </h3>
-                      <template if:true={job.isNew}>
-                        <span class="status-chip">New</span>
+                          <a
+                            href="#"
+                            onclick={handleJobClick}
+                            data-id={job.Id}
+                            class="job-title-link"
+                          >
+                            {job.Job_Title__c}
+                          </a>
+                        </h3>
+                        <template if:true={job.isNew}>
+                          <span class="status-chip">New</span>
+                        </template>
+                      </div>
+                      <p class="slds-text-body_regular slds-m-bottom_x-small">
+                        <strong>{job.Company__c}</strong> • {job.Location__c}
+                      </p>
+                      <div class="job-meta slds-m-bottom_x-small">
+                        <span class="job-meta-item">{job.Job_Type__c}</span>
+                        <span class="job-meta-item">{job.Salary_Range__c}</span>
+                        <span class="job-meta-item">{job.relativeTime}</span>
+                      </div>
+                      <template if:true={job.Description__c}>
+                        <p class="slds-text-body_small job-description">
+                          {job.Description__c}
+                        </p>
+                      </template>
+                      <template if:true={job.Required_Skills__c}>
+                        <div class="slds-m-top_x-small">
+                          <span class="slds-text-body_small"
+                            ><strong>Skills:</strong></span
+                          >
+                          <div class="skill-tags">
+                            <template for:each={job.skillTags} for:item="skill">
+                              <span
+                                key={skill}
+                                class="slds-badge slds-badge_light skill-tag"
+                              >
+                                {skill}
+                              </span>
+                            </template>
+                          </div>
+                        </div>
                       </template>
                     </div>
-                    <p class="slds-text-body_regular slds-m-bottom_x-small">
-                      <strong>{job.Company__c}</strong> • {job.Location__c}
-                    </p>
-                    <div class="job-meta slds-m-bottom_x-small">
-                      <span class="job-meta-item">{job.Job_Type__c}</span>
-                      <span class="job-meta-item">{job.Salary_Range__c}</span>
-                      <span class="job-meta-item">{job.relativeTime}</span>
-                    </div>
-                    <template if:true={job.Description__c}>
-                      <p class="slds-text-body_small job-description">
-                        {job.Description__c}
-                      </p>
-                    </template>
-                    <template if:true={job.Required_Skills__c}>
-                      <div class="slds-m-top_x-small">
-                        <span class="slds-text-body_small"
-                          ><strong>Skills:</strong></span
+                    <div
+                      class="slds-col slds-size_1-of-1 slds-large-size_4-of-12 slds-text-align_right card-action-container"
+                    >
+                      <div class="slds-m-top_medium card-actions">
+                        <lightning-button
+                          label="View Details"
+                          variant="neutral"
+                          data-id={job.Id}
+                          onclick={handleViewDetails}
+                          class="slds-m-right_x-small view-details-button"
                         >
-                        <div class="skill-tags">
-                          <template for:each={job.skillTags} for:item="skill">
-                            <span
-                              key={skill}
-                              class="slds-badge slds-badge_light skill-tag"
-                            >
-                              {skill}
-                            </span>
-                          </template>
-                        </div>
+                        </lightning-button>
+                        <lightning-button
+                          label="Apply Now"
+                          variant="brand"
+                          data-id={job.Id}
+                          onclick={handleApply}
+                          class="apply-button"
+                        >
+                        </lightning-button>
                       </div>
-                    </template>
+                      <p
+                        class="slds-text-body_small slds-text-color_weak slds-m-top_x-small"
+                      >
+                        Posted {job.relativeTime}
+                      </p>
+                    </div>
                   </div>
-                  <div
-                    class="slds-col slds-size_1-of-1 slds-large-size_4-of-12 slds-text-align_right"
-                  >
+                </div>
+              </template>
+            </template>
+
+            <!-- Jobs Empty State -->
+            <template if:false={paginatedJobs.length}>
+              <div
+                class="slds-p-around_large slds-text-align_center empty-state-container slds-m-horizontal_medium"
+              >
+                <lightning-icon
+                  icon-name="standard:search"
+                  size="large"
+                  class="slds-m-bottom_medium empty-state-icon"
+                ></lightning-icon>
+                <h3 class="slds-text-heading_medium empty-state-title">
+                  No jobs found
+                </h3>
+                <p class="slds-text-body_regular empty-state-subtitle">
+                  Try adjusting your search criteria or filters.
+                </p>
+              </div>
+            </template>
+
+            <!-- Jobs Pagination -->
+            <template if:true={showPagination}>
+              <div class="slds-p-around_medium">
+                <div class="slds-grid slds-grid_align-center">
+                  <div class="slds-col">
                     <lightning-button
-                      label="Apply Now"
-                      variant="brand"
-                      data-id={job.Id}
-                      onclick={handleApply}
-                      class="slds-m-top_medium apply-button"
+                      label="Previous"
+                      variant="neutral"
+                      disabled={hasPreviousPage}
+                      onclick={handlePreviousPage}
+                      class="slds-m-right_small"
                     >
                     </lightning-button>
-                    <p
-                      class="slds-text-body_small slds-text-color_weak slds-m-top_x-small"
+                    <span class="slds-text-body_regular">
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <lightning-button
+                      label="Next"
+                      variant="neutral"
+                      disabled={hasNextPage}
+                      onclick={handleNextPage}
+                      class="slds-m-left_small"
                     >
-                      Posted {job.relativeTime}
-                    </p>
+                    </lightning-button>
                   </div>
                 </div>
               </div>
             </template>
           </template>
-          <template if:false={paginatedJobs.length}>
-            <div class="slds-p-around_large slds-text-align_center">
-              <lightning-icon
-                icon-name="standard:search"
-                size="large"
-                class="slds-m-bottom_medium"
-              ></lightning-icon>
-              <h3 class="slds-text-heading_medium">No jobs found</h3>
-              <p class="slds-text-body_regular">
-                Try adjusting your search criteria or filters.
-              </p>
-            </div>
-          </template>
+        </template>
 
-          <template if:true={showPagination}>
-            <div class="slds-p-around_medium">
-              <div class="slds-grid slds-grid_align-center">
-                <div class="slds-col">
-                  <lightning-button
-                    label="Previous"
-                    variant="neutral"
-                    disabled={hasPreviousPage}
-                    onclick={handlePreviousPage}
-                    class="slds-m-right_small"
+        <!-- Tab 2: My Applications -->
+        <template if:true={isApplicationsTabActive}>
+          <div class="slds-p-horizontal_medium">
+            <template if:true={applications.length}>
+              <div class="slds-grid slds-wrap slds-gutters">
+                <template for:each={applications} for:item="app">
+                  <div
+                    key={app.Id}
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_medium"
                   >
-                  </lightning-button>
-                  <span class="slds-text-body_regular">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <lightning-button
-                    label="Next"
-                    variant="neutral"
-                    disabled={hasNextPage}
-                    onclick={handleNextPage}
-                    class="slds-m-left_small"
-                  >
-                  </lightning-button>
-                </div>
+                    <div class="slds-box application-card">
+                      <div
+                        class="slds-grid slds-grid_align-spread slds-align-middle slds-m-bottom_small"
+                      >
+                        <span class="application-name">{app.Name}</span>
+                        <span class={app.statusClass}
+                          >{app.Application_Status__c}</span
+                        >
+                      </div>
+                      <h3 class="application-job-title">
+                        {app.Job__r.Job_Title__c}
+                      </h3>
+                      <p class="application-company">{app.Job__r.Company__c}</p>
+                      <div class="application-footer slds-m-top_medium">
+                        <span class="applied-date-label">Applied Date</span>
+                        <span class="applied-date-value"
+                          >{app.formattedDate}</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </template>
               </div>
-            </div>
-          </template>
+            </template>
+
+            <!-- Applications Empty State -->
+            <template if:false={applications.length}>
+              <div
+                class="slds-p-around_large slds-text-align_center empty-state-container"
+              >
+                <lightning-icon
+                  icon-name="utility:inbox"
+                  size="large"
+                  class="slds-m-bottom_medium empty-state-icon"
+                ></lightning-icon>
+                <h3 class="slds-text-heading_medium empty-state-title">
+                  No applications submitted yet.
+                </h3>
+                <p class="slds-text-body_regular empty-state-subtitle">
+                  Explore active openings and apply for roles to see them
+                  tracked here.
+                </p>
+              </div>
+            </template>
+          </div>
         </template>
       </section>
     </div>
 
+    <!-- View Job Details Modal -->
+    <template if:true={showDetailsModal}>
+      <div
+        class="slds-modal slds-fade-in-open custom-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="details-modal-heading"
+      >
+        <div class="slds-modal__container">
+          <header class="slds-modal__header modal-header-premium">
+            <button
+              class="slds-button slds-button_icon slds-modal__close modal-close-btn"
+              title="Close"
+              onclick={handleCloseDetails}
+            >
+              <lightning-icon
+                icon-name="utility:close"
+                alternative-text="close"
+                size="small"
+                variant="bare"
+              ></lightning-icon>
+              <span class="slds-assistive-text">Close</span>
+            </button>
+            <h2
+              id="details-modal-heading"
+              class="slds-modal__title slds-hyphenate modal-header-title"
+            >
+              Job Position Details
+            </h2>
+          </header>
+          <div class="slds-modal__content modal-body-premium">
+            <template if:true={selectedJob}>
+              <div class="details-header slds-m-bottom_large">
+                <h3 class="details-job-title">{selectedJob.Job_Title__c}</h3>
+                <p class="details-company slds-m-top_xx-small">
+                  <strong>{selectedJob.Company__c}</strong> •
+                  {selectedJob.Location__c}
+                </p>
+              </div>
+
+              <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_large">
+                <div
+                  class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                >
+                  <div class="detail-info-block">
+                    <span class="detail-info-label">Job Type</span>
+                    <span class="detail-info-value"
+                      >{selectedJob.Job_Type__c}</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                >
+                  <div class="detail-info-block">
+                    <span class="detail-info-label">Salary Range</span>
+                    <span class="detail-info-value"
+                      >{selectedJob.Salary_Range__c}</span
+                    >
+                  </div>
+                </div>
+                <div
+                  class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                >
+                  <div class="detail-info-block">
+                    <span class="detail-info-label">Posted Date</span>
+                    <span class="detail-info-value"
+                      >{selectedJob.relativeTime}</span
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <template if:true={selectedJob.Required_Skills__c}>
+                <div class="slds-m-bottom_large">
+                  <h4 class="details-section-title">Required Skills</h4>
+                  <div class="skill-tags slds-m-top_x-small">
+                    <template for:each={selectedJob.skillTags} for:item="skill">
+                      <span
+                        key={skill}
+                        class="slds-badge slds-badge_light skill-tag"
+                      >
+                        {skill}
+                      </span>
+                    </template>
+                  </div>
+                </div>
+              </template>
+
+              <div class="slds-m-bottom_large">
+                <h4 class="details-section-title">Job Description</h4>
+                <p class="details-description slds-m-top_x-small">
+                  {selectedJob.Description__c}
+                </p>
+              </div>
+            </template>
+          </div>
+          <footer class="slds-modal__footer modal-footer-premium">
+            <lightning-button
+              label="Close"
+              variant="neutral"
+              onclick={handleCloseDetails}
+              class="modal-btn-cancel"
+            >
+            </lightning-button>
+            <lightning-button
+              label="Apply Now"
+              variant="brand"
+              onclick={handleApplyFromDetails}
+              class="modal-btn-submit"
+            >
+            </lightning-button>
+          </footer>
+        </div>
+      </div>
+      <div class="slds-backdrop slds-backdrop_open custom-backdrop"></div>
+    </template>
+
+    <!-- Submit Application Form Modal -->
     <template if:true={showForm}>
       <div
         class="slds-modal slds-fade-in-open custom-modal"

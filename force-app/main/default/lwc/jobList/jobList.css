@@ -610,3 +610,264 @@
     position: static;
   }
 }
+
+/* Custom Premium Navigation Tabs */
+.custom-tab-container {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.custom-tab-list {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.custom-tab-item {
+  position: relative;
+  padding-bottom: 0.75rem;
+}
+
+.custom-tab-link {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #64748b;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+.custom-tab-link:hover {
+  color: #4f46e5;
+}
+
+.custom-tab-item.active .custom-tab-link {
+  color: #4f46e5;
+}
+
+.custom-tab-item::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #7c3aed);
+  border-radius: 999px;
+  opacity: 0;
+  transform: scaleX(0.8);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.custom-tab-item.active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Application Cards Listing */
+.application-card {
+  border-radius: 1.25rem;
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 100%;
+  text-align: left;
+}
+
+.application-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.06);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.application-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #64748b;
+  letter-spacing: 0.5px;
+}
+
+.application-job-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0f172a;
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  line-height: 1.3;
+}
+
+.application-company {
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 600;
+}
+
+.application-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 0.85rem;
+  font-size: 0.85rem;
+}
+
+.applied-date-label {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.applied-date-value {
+  color: #1e293b;
+  font-weight: 700;
+}
+
+/* Application Status Badge Styling */
+.status-badge {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.725rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.status-badge_applied {
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.status-badge_shortlisted {
+  background: #fef3c7;
+  color: #d97706;
+  border: 1px solid #fde68a;
+}
+
+.status-badge_selected {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.status-badge_rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+/* Job Details Modal Formatting */
+.details-header {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 1.25rem;
+  text-align: left;
+}
+
+.details-job-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+}
+
+.details-company {
+  font-size: 1.1rem;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.details-section-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #f1f5f9;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.details-description {
+  font-size: 0.95rem;
+  color: #475569;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  text-align: left;
+}
+
+.detail-info-block {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+}
+
+.detail-info-label {
+  display: block;
+  font-size: 0.725rem;
+  color: #64748b;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.detail-info-value {
+  display: block;
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+/* Empty States Formatting */
+.empty-state-container {
+  background: #ffffff;
+  border: 2px dashed #cbd5e1;
+  border-radius: 1.25rem;
+  padding: 3.5rem 2rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.empty-state-icon {
+  --sds-c-icon-color-foreground: #94a3b8;
+}
+
+.empty-state-title {
+  font-weight: 800;
+  color: #334155;
+  margin-top: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.empty-state-subtitle {
+  color: #64748b;
+  max-width: 28rem;
+  margin: 0.25rem auto 0 auto;
+  line-height: 1.5;
+}
+
+.card-action-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.card-actions {
+  display: flex;
+  align-items: center;
+}
+
+.view-details-button {
+  --sds-c-button-radius-border: 999px;
+}

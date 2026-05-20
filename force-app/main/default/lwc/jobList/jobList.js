@@ -2,6 +2,7 @@ import { LightningElement, wire } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
 import getAllJobs from "@salesforce/apex/JobPortalController.getAllJobs";
 import createApplication from "@salesforce/apex/JobPortalController.createApplication";
+import getMyApplications from "@salesforce/apex/JobPortalController.getMyApplications";
 
 export default class JobList extends LightningElement {
   jobs = [];
@@ -9,17 +10,25 @@ export default class JobList extends LightningElement {
   error;
   isLoading = false;
 
+  // Apply Form Modal states
   showForm = false;
   selectedJobId;
   resumeUrl = "";
   coverLetter = "";
 
+  // Advanced features states
+  activeTab = "jobs";
+  showDetailsModal = false;
+  applications = [];
+
+  // Search and Filter states
   searchTerm = "";
   selectedJobType = "";
   selectedLocation = "";
   sortBy = "createdDate";
   sortOrder = "desc";
 
+  // Pagination states
   currentPage = 1;
   pageSize = 10;
   totalPages = 1;
@@ -27,6 +36,57 @@ export default class JobList extends LightningElement {
   // Animated counter state
   displayMetrics = [];
   animationComplete = false;
+
+  connectedCallback() {
+    this.fetchApplications();
+  }
+
+  // Retrieve submitted applications securely via Apex
+  async fetchApplications() {
+    try {
+      const data = await getMyApplications();
+      if (!data || !Array.isArray(data)) {
+        this.applications = [];
+        return;
+      }
+      this.applications = data.map((app) => {
+        let statusClass = "status-badge ";
+        const status = app.Application_Status__c
+          ? app.Application_Status__c.toLowerCase()
+          : "";
+        if (status === "applied") {
+          statusClass += "status-badge_applied";
+        } else if (status === "shortlisted") {
+          statusClass += "status-badge_shortlisted";
+        } else if (status === "selected") {
+          statusClass += "status-badge_selected";
+        } else if (status === "rejected") {
+          statusClass += "status-badge_rejected";
+        } else {
+          statusClass += "status-badge_applied";
+        }
+
+        let formattedDate = "";
+        if (app.Applied_Date__c) {
+          const dateObj = new Date(app.Applied_Date__c);
+          formattedDate = dateObj.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+            timeZone: "UTC"
+          });
+        }
+
+        return {
+          ...app,
+          statusClass,
+          formattedDate
+        };
+      });
+    } catch (err) {
+      console.error("Error fetching applications:", err);
+    }
+  }
 
   get jobTypes() {
     if (!this.jobs || !Array.isArray(this.jobs)) return [];
@@ -123,6 +183,26 @@ export default class JobList extends LightningElement {
     return this.currentPage >= this.totalPages;
   }
 
+  get isJobsTabActive() {
+    return this.activeTab === "jobs";
+  }
+
+  get isApplicationsTabActive() {
+    return this.activeTab === "applications";
+  }
+
+  get activeJobsTabClass() {
+    return this.activeTab === "jobs"
+      ? "custom-tab-item active"
+      : "custom-tab-item";
+  }
+
+  get activeApplicationsTabClass() {
+    return this.activeTab === "applications"
+      ? "custom-tab-item active"
+      : "custom-tab-item";
+  }
+
   @wire(getAllJobs)
   wiredJobs({ error, data }) {
     this.isLoading = true;
@@ -141,7 +221,6 @@ export default class JobList extends LightningElement {
       this.jobs = jobsWithMetadata;
       this.error = undefined;
       this.applyFiltersAndSort();
-      // Trigger animation after data loads
       this.animateMetrics();
     } else if (error) {
       this.error = error;
@@ -153,7 +232,6 @@ export default class JobList extends LightningElement {
   }
 
   animateMetrics() {
-    // Set display metrics to final values
     const metrics = this.activityMetrics;
     this.displayMetrics = metrics.map((metric) => ({
       ...metric,
@@ -264,6 +342,30 @@ export default class JobList extends LightningElement {
     if (this.currentPage < this.totalPages) {
       this.currentPage += 1;
     }
+  }
+
+  // Tab Selection Switcher
+  handleTabChange(event) {
+    event.preventDefault();
+    this.activeTab = event.target.dataset.tab;
+    if (this.activeTab === "applications") {
+      this.fetchApplications();
+    }
+  }
+
+  // Modal view handlers for details and applications
+  handleViewDetails(event) {
+    this.selectedJobId = event.target.dataset.id;
+    this.showDetailsModal = true;
+  }
+
+  handleCloseDetails() {
+    this.showDetailsModal = false;
+  }
+
+  handleApplyFromDetails() {
+    this.showDetailsModal = false;
+    this.showForm = true;
   }
 
   handleApply(event) {
@@ -386,6 +488,10 @@ export default class JobList extends LightningElement {
       this.showForm = false;
       this.resumeUrl = "";
       this.coverLetter = "";
+
+      // Instantly refresh application list dynamically on success
+      await this.fetchApplications();
+
       this.dispatchEvent(
         new ShowToastEvent({
           title: "Success",
