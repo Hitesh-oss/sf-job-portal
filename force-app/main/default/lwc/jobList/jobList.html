@@ -1,5 +1,5 @@
 <template>
-  <div class="slds-card job-portal-container slds-p-around_medium">
+  <lightning-card title="Job Portal Dashboard" icon-name="standard:jobs">
     <!-- Advanced Header Section -->
     <div class="advanced-header slds-p-around_medium">
       <div class="header-top slds-m-bottom_medium">
@@ -60,9 +60,7 @@
       </div>
     </div>
 
-    <div
-      class="slds-grid slds-wrap slds-gutters dashboard-layout slds-m-top_large"
-    >
+    <div class="slds-grid slds-wrap dashboard-layout">
       <aside
         class="dashboard-sidebar slds-col slds-size_1-of-1 slds-large-size_1-of-4"
       >
@@ -161,7 +159,7 @@
                 <div class="progress-bar">
                   <div
                     class="progress-fill"
-                    style={metric.styleExpression}
+                    data-percentage={metric.percentage}
                   ></div>
                 </div>
                 <p class="slds-text-body_small activity-percent">
@@ -345,23 +343,66 @@
     </div>
 
     <template if:true={showForm}>
-      <div class="slds-modal slds-fade-in-open slds-modal_medium">
+      <div
+        class="slds-modal slds-fade-in-open custom-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-heading-01"
+      >
         <div class="slds-modal__container">
-          <div class="slds-modal__header">
-            <h2 class="slds-text-heading_medium">Apply for Job</h2>
+          <header class="slds-modal__header modal-header-premium">
             <button
-              class="slds-button slds-button_icon slds-modal__close"
+              class="slds-button slds-button_icon slds-modal__close modal-close-btn"
+              title="Close"
               onclick={handleCancel}
             >
               <lightning-icon
                 icon-name="utility:close"
+                alternative-text="close"
                 size="small"
+                variant="bare"
               ></lightning-icon>
+              <span class="slds-assistive-text">Close</span>
             </button>
-          </div>
-          <div class="slds-modal__content">
-            <div class="slds-grid slds-gutters">
-              <div class="slds-col slds-size_1-of-1">
+            <h2
+              id="modal-heading-01"
+              class="slds-modal__title slds-hyphenate modal-header-title"
+            >
+              Apply for Position
+            </h2>
+          </header>
+          <div class="slds-modal__content modal-body-premium">
+            <!-- Job Detail Banner -->
+            <template if:true={selectedJob}>
+              <div
+                class="modal-job-banner slds-m-bottom_medium slds-p-around_medium"
+              >
+                <div
+                  class="slds-grid slds-grid_align-spread slds-align-middle slds-wrap"
+                >
+                  <div
+                    class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3"
+                  >
+                    <h3 class="modal-job-title">{selectedJob.Job_Title__c}</h3>
+                    <p class="modal-job-company slds-m-top_xx-small">
+                      <strong>{selectedJob.Company__c}</strong> •
+                      {selectedJob.Location__c}
+                    </p>
+                  </div>
+                  <div
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-text-align_right slds-m-top_small slds-medium-m-top_none"
+                  >
+                    <span class="modal-job-type-badge"
+                      >{selectedJob.Job_Type__c}</span
+                    >
+                  </div>
+                </div>
+              </div>
+            </template>
+
+            <!-- Form Fields -->
+            <div class="slds-form form-field-container">
+              <div class="slds-form-element">
                 <lightning-input
                   type="url"
                   label="Resume URL"
@@ -370,10 +411,11 @@
                   data-field="resume"
                   onchange={handleResumeChange}
                   required
+                  class="custom-form-input"
                 >
                 </lightning-input>
               </div>
-              <div class="slds-col slds-size_1-of-1">
+              <div class="slds-form-element slds-m-top_medium">
                 <lightning-textarea
                   label="Cover Letter"
                   placeholder="Tell us why you're interested in this position..."
@@ -382,16 +424,18 @@
                   onchange={handleCoverChange}
                   min-length="50"
                   required
+                  class="custom-form-textarea"
                 >
                 </lightning-textarea>
               </div>
             </div>
           </div>
-          <div class="slds-modal__footer">
+          <footer class="slds-modal__footer modal-footer-premium">
             <lightning-button
               label="Cancel"
               variant="neutral"
               onclick={handleCancel}
+              class="modal-btn-cancel"
             >
             </lightning-button>
             <lightning-button
@@ -399,12 +443,13 @@
               variant="brand"
               onclick={submitApplication}
               disabled={isLoading}
+              class="modal-btn-submit"
             >
             </lightning-button>
-          </div>
+          </footer>
         </div>
       </div>
-      <div class="slds-backdrop slds-backdrop_open"></div>
+      <div class="slds-backdrop slds-backdrop_open custom-backdrop"></div>
     </template>
-  </div>
+  </lightning-card>
 </template>

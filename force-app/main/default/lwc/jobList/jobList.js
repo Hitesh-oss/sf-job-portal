@@ -106,6 +106,11 @@ export default class JobList extends LightningElement {
     return this.filteredJobs.slice(startIndex, startIndex + this.pageSize);
   }
 
+  get selectedJob() {
+    if (!this.jobs || !this.selectedJobId) return null;
+    return this.jobs.find((job) => job.Id === this.selectedJobId);
+  }
+
   get showPagination() {
     return this.totalPages > 1;
   }
@@ -152,8 +157,7 @@ export default class JobList extends LightningElement {
     const metrics = this.activityMetrics;
     this.displayMetrics = metrics.map((metric) => ({
       ...metric,
-      displayValue: metric.value,
-      styleExpression: `width: ${metric.percentage}%`
+      displayValue: metric.value
     }));
     this.animationComplete = true;
   }
