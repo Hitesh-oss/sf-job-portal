@@ -4,6 +4,7 @@
     <externalId>true</externalId>
     <label>External Job Id</label>
     <length>255</length>
+    <description>External Job Id from API</description>
     <required>false</required>
     <trackHistory>false</trackHistory>
     <trackTrending>false</trackTrending>
