@@ -15,7 +15,15 @@
               <span class="badge badge-info">📍 Live Openings</span>
             </div>
           </div>
-          <div class="header-stats">
+          <div class="header-stats slds-grid slds-align-middle">
+            <lightning-button
+              label="Sync Real Jobs"
+              icon-name="utility:sync"
+              variant="neutral"
+              onclick={handleSyncJobs}
+              class="sync-button slds-m-right_medium"
+            >
+            </lightning-button>
             <div class="stat-box">
               <span class="stat-number">{filteredJobs.length}</span>
               <span class="stat-label">Active Jobs</span>

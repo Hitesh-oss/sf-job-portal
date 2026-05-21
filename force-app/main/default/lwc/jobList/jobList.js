@@ -1,8 +1,10 @@
 import { LightningElement, wire } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
+import { refreshApex } from "@salesforce/apex";
 import getAllJobs from "@salesforce/apex/JobPortalController.getAllJobs";
 import createApplication from "@salesforce/apex/JobPortalController.createApplication";
 import getMyApplications from "@salesforce/apex/JobPortalController.getMyApplications";
+import syncJobs from "@salesforce/apex/JobPortalController.syncJobs";
 
 export default class JobList extends LightningElement {
   jobs = [];
@@ -203,8 +205,12 @@ export default class JobList extends LightningElement {
       : "custom-tab-item";
   }
 
+  wiredJobsResult;
+
   @wire(getAllJobs)
-  wiredJobs({ error, data }) {
+  wiredJobs(result) {
+    this.wiredJobsResult = result;
+    const { error, data } = result;
     this.isLoading = true;
     if (data) {
       const jobsWithMetadata = data.map((job) => {
@@ -503,6 +509,37 @@ export default class JobList extends LightningElement {
       let message = "Failed to submit application. Please try again.";
       if (error?.body?.message) {
         message = error.body.message;
+      }
+      this.dispatchEvent(
+        new ShowToastEvent({
+          title: "Error",
+          message,
+          variant: "error"
+        })
+      );
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  async handleSyncJobs() {
+    this.isLoading = true;
+    try {
+      await syncJobs();
+      this.dispatchEvent(
+        new ShowToastEvent({
+          title: "Success",
+          message: "Real jobs synchronized successfully!",
+          variant: "success"
+        })
+      );
+      await refreshApex(this.wiredJobsResult);
+    } catch (error) {
+      let message = "Failed to sync jobs.";
+      if (error?.body?.message) {
+        message = error.body.message;
+      } else if (error?.message) {
+        message = error.message;
       }
       this.dispatchEvent(
         new ShowToastEvent({

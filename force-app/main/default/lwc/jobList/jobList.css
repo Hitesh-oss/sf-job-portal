@@ -871,3 +871,23 @@
 .view-details-button {
   --sds-c-button-radius-border: 999px;
 }
+
+.sync-button {
+  --sds-c-button-neutral-color-background: #ffffff;
+  --sds-c-button-neutral-color-text: #4f46e5;
+  --sds-c-button-neutral-color-border: #ffffff;
+  --sds-c-button-neutral-color-background-hover: #f8fafc;
+  --sds-c-button-neutral-color-text-hover: #4338ca;
+  --sds-c-button-neutral-radius-border: 999px;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  display: inline-block;
+}
+
+.sync-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}

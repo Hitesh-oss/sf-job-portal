@@ -135,4 +135,13 @@ public with sharing class JobPortalController {
       throw new AuraHandledException(e.getMessage());
     }
   }
+
+  @AuraEnabled
+  public static void syncJobs() {
+    try {
+      JobApiService.fetchAndSaveJobs();
+    } catch (Exception e) {
+      throw new AuraHandledException(e.getMessage());
+    }
+  }
 }

@@ -152,4 +152,62 @@ public class JobPortalControllerTest {
     }
     Test.stopTest();
   }
+
+  @isTest
+  static void testSyncJobsSuccess() {
+    String jsonPayload =
+      '{' +
+      '"jobs": [' +
+      '{' +
+      '"id": 112233,' +
+      '"url": "https://remotive.com/jobs/112233",' +
+      '"title": "Salesforce Specialist",' +
+      '"company_name": "Antigravity Corp",' +
+      '"job_type": "full_time",' +
+      '"publication_date": "2026-05-21",' +
+      '"description": "Role Details"' +
+      '}' +
+      ']' +
+      '}';
+
+    Test.setMock(
+      HttpCalloutMock.class,
+      new JobApiServiceTest.JobServiceMock(200, 'OK', jsonPayload)
+    );
+
+    Test.startTest();
+    JobPortalController.syncJobs();
+    Test.stopTest();
+
+    List<Job__c> syncedJobs = [
+      SELECT Id, Job_Title__c
+      FROM Job__c
+      WHERE External_Job_Id__c = '112233'
+    ];
+    System.assertEquals(
+      1,
+      syncedJobs.size(),
+      'Should successfully sync one job via controller.'
+    );
+  }
+
+  @isTest
+  static void testSyncJobsError() {
+    Test.setMock(
+      HttpCalloutMock.class,
+      new JobApiServiceTest.JobServiceMock(true)
+    );
+
+    Test.startTest();
+    try {
+      JobPortalController.syncJobs();
+      System.assert(false, 'Expected AuraHandledException to be thrown.');
+    } catch (AuraHandledException e) {
+      System.assert(
+        e.getMessage() != null,
+        'AuraHandledException successfully thrown.'
+      );
+    }
+    Test.stopTest();
+  }
 }
