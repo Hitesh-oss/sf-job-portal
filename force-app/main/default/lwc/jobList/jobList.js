@@ -91,29 +91,36 @@ export default class JobList extends LightningElement {
   }
 
   get jobTypes() {
-    if (!this.jobs || !Array.isArray(this.jobs)) return [];
-    const types = [...new Set(this.jobs.map((job) => job.Job_Type__c))].filter(
-      Boolean
-    );
-    return types.map((type) => ({ label: type, value: type }));
+    return [
+      { label: "All Types", value: "" },
+      { label: "Full-time", value: "Full-time" },
+      { label: "Part-time", value: "Part-time" },
+      { label: "Internship", value: "Internship" },
+      { label: "Remote", value: "Remote" },
+      { label: "Contract", value: "Contract," }
+    ];
   }
 
   get locations() {
-    if (!this.jobs || !Array.isArray(this.jobs)) return [];
-    const locs = [...new Set(this.jobs.map((job) => job.Location__c))].filter(
-      Boolean
-    );
-    return locs.map((loc) => ({ label: loc, value: loc }));
+    if (!this.jobs || !Array.isArray(this.jobs)) {
+      return [{ label: "All Locations", value: "" }];
+    }
+    const uniqueLocs = [...new Set(this.jobs.map((job) => job.Location__c))]
+      .filter(Boolean)
+      .sort();
+    const options = [{ label: "All Locations", value: "" }];
+    uniqueLocs.forEach((loc) => {
+      options.push({ label: loc, value: loc });
+    });
+    return options;
   }
 
   get sortOptions() {
     return [
       { label: "Posted Date (Newest)", value: "createdDate_desc" },
       { label: "Posted Date (Oldest)", value: "createdDate_asc" },
-      { label: "Job Title (A-Z)", value: "title_asc" },
-      { label: "Job Title (Z-A)", value: "title_desc" },
-      { label: "Company (A-Z)", value: "company_asc" },
-      { label: "Company (Z-A)", value: "company_desc" }
+      { label: "Salary (High to Low)", value: "salary_desc" },
+      { label: "Salary (Low to High)", value: "salary_asc" }
     ];
   }
 
@@ -246,6 +253,17 @@ export default class JobList extends LightningElement {
     this.animationComplete = true;
   }
 
+  parseSalary(salaryStr) {
+    if (!salaryStr) return 0;
+    const lower = salaryStr.toLowerCase();
+    const firstPart = lower.split("-")[0].trim();
+    const digits = parseFloat(firstPart.replace(/[^0-9.]/g, ""));
+    if (isNaN(digits)) return 0;
+    if (lower.includes("lpa")) return digits * 100000;
+    if (firstPart.includes("k")) return digits * 1000;
+    return digits;
+  }
+
   applyFiltersAndSort() {
     let filtered = [...this.jobs];
 
@@ -255,15 +273,25 @@ export default class JobList extends LightningElement {
         (job) =>
           (job.Job_Title__c || "").toLowerCase().includes(term) ||
           (job.Company__c || "").toLowerCase().includes(term) ||
+          (job.Location__c || "").toLowerCase().includes(term) ||
           (job.Description__c || "").toLowerCase().includes(term) ||
           (job.Required_Skills__c || "").toLowerCase().includes(term)
       );
     }
 
     if (this.selectedJobType) {
-      filtered = filtered.filter(
-        (job) => job.Job_Type__c === this.selectedJobType
-      );
+      filtered = filtered.filter((job) => {
+        if (this.selectedJobType === "Remote") {
+          return (
+            (job.Job_Type__c || "").toLowerCase().includes("remote") ||
+            (job.Location__c || "").toLowerCase().includes("remote")
+          );
+        }
+        if (this.selectedJobType === "Contract,") {
+          return (job.Job_Type__c || "").startsWith("Contract");
+        }
+        return job.Job_Type__c === this.selectedJobType;
+      });
     }
 
     if (this.selectedLocation) {
@@ -279,20 +307,16 @@ export default class JobList extends LightningElement {
 
       switch (sortField) {
         case "createdDate":
-          aValue = new Date(a.CreatedDate);
-          bValue = new Date(b.CreatedDate);
+          aValue = new Date(a.Posted_Date__c || a.CreatedDate).getTime();
+          bValue = new Date(b.Posted_Date__c || b.CreatedDate).getTime();
           break;
-        case "title":
-          aValue = (a.Job_Title__c || "").toLowerCase();
-          bValue = (b.Job_Title__c || "").toLowerCase();
-          break;
-        case "company":
-          aValue = (a.Company__c || "").toLowerCase();
-          bValue = (b.Company__c || "").toLowerCase();
+        case "salary":
+          aValue = this.parseSalary(a.Salary_Range__c);
+          bValue = this.parseSalary(b.Salary_Range__c);
           break;
         default:
-          aValue = "";
-          bValue = "";
+          aValue = 0;
+          bValue = 0;
       }
 
       if (aValue < bValue) {

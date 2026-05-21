@@ -13,10 +13,16 @@ public with sharing class JobPortalController {
         Salary_Range__c,
         Description__c,
         Required_Skills__c,
+        Posted_Date__c,
+        Status__c,
+        Apply_URL__c,
+        External_Job_Id__c,
+        Source__c,
         CreatedDate
       FROM Job__c
+      WHERE Status__c = 'Active,'
       WITH USER_MODE
-      ORDER BY CreatedDate DESC
+      ORDER BY Posted_Date__c DESC NULLS LAST
     ];
   }
 
