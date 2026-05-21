@@ -107,9 +107,9 @@ public with sharing class JobApiService {
     }
 
     if (!jobsToUpsert.isEmpty()) {
-      // Perform bulk upsert securely enforcing user CRUD/FLS permissions
+      // Perform bulk upsert enforcing system permissions to avoid FLS errors
       try {
-        upsert as user jobsToUpsert External_Job_Id__c;
+        upsert as system jobsToUpsert External_Job_Id__c;
       } catch (DmlException e) {
         throw new DmlException(
           'Failed to save synced job listings: ' + e.getDmlMessage(0)

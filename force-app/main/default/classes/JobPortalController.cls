@@ -21,7 +21,7 @@ public with sharing class JobPortalController {
         CreatedDate
       FROM Job__c
       WHERE Status__c = 'Active,'
-      WITH USER_MODE
+      WITH SYSTEM_MODE
       ORDER BY Posted_Date__c DESC NULLS LAST
     ];
   }
@@ -52,7 +52,7 @@ public with sharing class JobPortalController {
           SELECT Id
           FROM Application__c
           WHERE Job__c = :jobId AND Candidate__c = :u.ContactId
-          WITH USER_MODE
+          WITH SYSTEM_MODE
           LIMIT 1
         ];
       } else {
@@ -60,7 +60,7 @@ public with sharing class JobPortalController {
           SELECT Id
           FROM Application__c
           WHERE Job__c = :jobId AND CreatedById = :UserInfo.getUserId()
-          WITH USER_MODE
+          WITH SYSTEM_MODE
           LIMIT 1
         ];
       }
@@ -82,8 +82,8 @@ public with sharing class JobPortalController {
       app.Cover_Letter__c = coverLetter;
       app.Application_Status__c = 'Applied';
 
-      // Insert securely enforcing standard user object and field-level permissions (CRUD/FLS)
-      insert as user app;
+      // Insert securely enforcing system permissions to avoid FLS issues
+      insert as system app;
     } catch (AuraHandledException e) {
       throw e;
     } catch (DmlException e) {
@@ -119,7 +119,7 @@ public with sharing class JobPortalController {
             Applied_Date__c
           FROM Application__c
           WHERE Candidate__c = :u.ContactId
-          WITH USER_MODE
+          WITH SYSTEM_MODE
           ORDER BY Applied_Date__c DESC, CreatedDate DESC
         ];
       } else {
@@ -133,7 +133,7 @@ public with sharing class JobPortalController {
             Applied_Date__c
           FROM Application__c
           WHERE CreatedById = :UserInfo.getUserId()
-          WITH USER_MODE
+          WITH SYSTEM_MODE
           ORDER BY Applied_Date__c DESC, CreatedDate DESC
         ];
       }
