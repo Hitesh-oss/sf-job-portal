@@ -23,6 +23,7 @@
     system-ui,
     -apple-system,
     sans-serif;
+  overflow-x: hidden;
 }
 
 .job-card {

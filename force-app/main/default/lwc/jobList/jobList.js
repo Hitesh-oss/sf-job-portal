@@ -97,21 +97,41 @@ export default class JobList extends LightningElement {
       { label: "Part-time", value: "Part-time" },
       { label: "Internship", value: "Internship" },
       { label: "Remote", value: "Remote" },
-      { label: "Contract", value: "Contract," }
+      { label: "Contract", value: "Contract" }
     ];
   }
 
   get locations() {
-    if (!this.jobs || !Array.isArray(this.jobs)) {
-      return [{ label: "All Locations", value: "" }];
+    const defaultLocations = [
+      "All Locations",
+      "Bhubaneswar",
+      "Bengaluru",
+      "Hyderabad",
+      "Pune",
+      "Mumbai",
+      "Delhi",
+      "Noida",
+      "Gurgaon",
+      "Chennai",
+      "Kolkata",
+      "Remote",
+      "India"
+    ];
+    let options = defaultLocations.map((loc) => ({
+      label: loc,
+      value: loc === "All Locations" ? "" : loc
+    }));
+
+    if (this.jobs && Array.isArray(this.jobs)) {
+      const uniqueLocs = [
+        ...new Set(this.jobs.map((job) => job.Location__c))
+      ].filter(Boolean);
+      uniqueLocs.forEach((loc) => {
+        if (!defaultLocations.includes(loc)) {
+          options.push({ label: loc, value: loc });
+        }
+      });
     }
-    const uniqueLocs = [...new Set(this.jobs.map((job) => job.Location__c))]
-      .filter(Boolean)
-      .sort();
-    const options = [{ label: "All Locations", value: "" }];
-    uniqueLocs.forEach((loc) => {
-      options.push({ label: loc, value: loc });
-    });
     return options;
   }
 
@@ -184,11 +204,11 @@ export default class JobList extends LightningElement {
     return this.totalPages > 1;
   }
 
-  get hasPreviousPage() {
+  get isFirstPage() {
     return this.currentPage <= 1;
   }
 
-  get hasNextPage() {
+  get isLastPage() {
     return this.currentPage >= this.totalPages;
   }
 
@@ -287,7 +307,7 @@ export default class JobList extends LightningElement {
             (job.Location__c || "").toLowerCase().includes("remote")
           );
         }
-        if (this.selectedJobType === "Contract,") {
+        if (this.selectedJobType === "Contract") {
           return (job.Job_Type__c || "").startsWith("Contract");
         }
         return job.Job_Type__c === this.selectedJobType;
@@ -295,9 +315,28 @@ export default class JobList extends LightningElement {
     }
 
     if (this.selectedLocation) {
-      filtered = filtered.filter(
-        (job) => job.Location__c === this.selectedLocation
-      );
+      if (this.selectedLocation === "India") {
+        const indiaCities = [
+          "Bhubaneswar",
+          "Bengaluru",
+          "Hyderabad",
+          "Pune",
+          "Mumbai",
+          "Delhi",
+          "Noida",
+          "Gurgaon",
+          "Chennai",
+          "Kolkata",
+          "India"
+        ];
+        filtered = filtered.filter((job) =>
+          indiaCities.includes(job.Location__c)
+        );
+      } else {
+        filtered = filtered.filter(
+          (job) => job.Location__c === this.selectedLocation
+        );
+      }
     }
 
     const [sortField, sortDirection] = this.sortValue.split("_");

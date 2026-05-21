@@ -372,7 +372,7 @@
                     <lightning-button
                       label="Previous"
                       variant="neutral"
-                      disabled={hasPreviousPage}
+                      disabled={isFirstPage}
                       onclick={handlePreviousPage}
                       class="slds-m-right_small"
                     >
@@ -383,7 +383,7 @@
                     <lightning-button
                       label="Next"
                       variant="neutral"
-                      disabled={hasNextPage}
+                      disabled={isLastPage}
                       onclick={handleNextPage}
                       class="slds-m-left_small"
                     >
