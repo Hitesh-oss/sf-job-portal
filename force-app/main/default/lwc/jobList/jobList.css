@@ -892,3 +892,354 @@
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
+
+/* ============================================================
+   THEME WRAPPER & TOGGLE BUTTON
+   ============================================================ */
+
+.theme-wrapper {
+  transition:
+    background-color 0.35s ease,
+    color 0.35s ease;
+  border-radius: 1.5rem;
+}
+
+.theme-toggle-btn {
+  --sds-c-button-neutral-color-background: rgba(255, 255, 255, 0.15);
+  --sds-c-button-neutral-color-text: #fff;
+  --sds-c-button-neutral-color-border: rgba(255, 255, 255, 0.35);
+  --sds-c-button-neutral-color-background-hover: rgba(255, 255, 255, 0.28);
+  --sds-c-button-neutral-color-text-hover: #fff;
+  --sds-c-button-neutral-radius-border: 999px;
+  font-weight: 700;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  display: inline-block;
+}
+
+.theme-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================
+   DARK THEME OVERRIDES
+   ============================================================ */
+
+/* Root page background */
+.dark-theme {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+/* Lightning card body background */
+.dark-theme lightning-card {
+  --sds-c-card-color-background: #1e293b;
+  --sds-c-card-color-border: #334155;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.dark-theme .advanced-header {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+}
+
+/* ── KPI bar ─────────────────────────────────────────────── */
+.dark-theme .kpi-bar {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .kpi-value {
+  color: #f1f5f9;
+}
+
+.dark-theme .kpi-label {
+  color: #94a3b8;
+}
+
+.dark-theme .kpi-item {
+  border-right-color: #334155;
+}
+
+/* ── Sidebar / Filters panel ─────────────────────────────── */
+.dark-theme .sidebar-panel,
+.dark-theme .slds-box.slds-theme_shade {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark-theme .slds-text-heading_small,
+.dark-theme .slds-text-title_caps {
+  color: #e2e8f0;
+}
+
+/* ── Featured job cards in sidebar ───────────────────────── */
+.dark-theme .featured-job-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+.dark-theme .featured-job-title {
+  color: #f1f5f9;
+}
+
+/* ── Activity metric cards ───────────────────────────────── */
+.dark-theme .activity-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .activity-value {
+  color: #f1f5f9;
+}
+
+/* ── Job summary sticky bar ──────────────────────────────── */
+.dark-theme .job-summary {
+  background: rgba(30, 41, 59, 0.85) !important;
+  border-color: #334155 !important;
+}
+
+.dark-theme .job-summary .slds-text-heading_small,
+.dark-theme .job-summary p {
+  color: #e2e8f0;
+}
+
+/* ── Job cards ───────────────────────────────────────────── */
+.dark-theme .job-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .job-card:hover {
+  border-color: rgba(124, 58, 237, 0.4);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.35),
+    0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .job-title-link {
+  color: #e2e8f0;
+}
+
+.dark-theme .job-title-link:hover {
+  color: #a78bfa;
+}
+
+.dark-theme .job-description {
+  color: #94a3b8;
+}
+
+.dark-theme .job-meta-item {
+  color: #94a3b8;
+}
+
+/* ── Skill tags ──────────────────────────────────────────── */
+.dark-theme .skill-tag {
+  background: linear-gradient(135deg, #052e16 0%, #14532d 100%);
+  color: #86efac;
+  border-color: #166534;
+}
+
+/* ── Status chip ─────────────────────────────────────────── */
+.dark-theme .status-chip {
+  background: #1e1b4b;
+  color: #a5b4fc;
+  border-color: #3730a3;
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+.dark-theme .custom-tab-container {
+  border-bottom-color: #334155;
+}
+
+.dark-theme .custom-tab-link {
+  color: #94a3b8;
+}
+
+.dark-theme .custom-tab-link:hover,
+.dark-theme .custom-tab-item.active .custom-tab-link {
+  color: #a78bfa;
+}
+
+/* ── Pagination ──────────────────────────────────────────── */
+.dark-theme .slds-text-body_regular {
+  color: #cbd5e1;
+}
+
+/* ── Application cards ───────────────────────────────────── */
+.dark-theme .application-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.dark-theme .application-card:hover {
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+.dark-theme .application-name {
+  color: #94a3b8;
+}
+
+.dark-theme .application-job-title {
+  color: #f1f5f9;
+}
+
+.dark-theme .application-company {
+  color: #94a3b8;
+}
+
+.dark-theme .application-footer {
+  border-top-color: #334155;
+}
+
+.dark-theme .applied-date-label {
+  color: #94a3b8;
+}
+
+.dark-theme .applied-date-value {
+  color: #e2e8f0;
+}
+
+/* ── Modals ──────────────────────────────────────────────── */
+.dark-theme .slds-modal__container {
+  background: #1e293b;
+}
+
+.dark-theme .modal-header-premium {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom-color: #334155;
+}
+
+.dark-theme .modal-header-title {
+  color: #f1f5f9;
+}
+
+.dark-theme .modal-close-btn {
+  background: #334155;
+  border-color: #475569;
+}
+
+.dark-theme .modal-close-btn:hover {
+  background: #475569;
+}
+
+.dark-theme .modal-body-premium {
+  background: #1e293b;
+}
+
+.dark-theme .modal-job-banner {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+  border-color: #3730a3;
+}
+
+.dark-theme .modal-job-title {
+  color: #e0e7ff;
+}
+
+.dark-theme .modal-job-company {
+  color: #a5b4fc;
+}
+
+.dark-theme .modal-footer-premium {
+  background: #0f172a;
+  border-top-color: #334155;
+}
+
+/* ── Job details modal ───────────────────────────────────── */
+.dark-theme .details-header {
+  border-bottom-color: #334155;
+}
+
+.dark-theme .details-job-title {
+  color: #f1f5f9;
+}
+
+.dark-theme .details-company {
+  color: #a78bfa;
+}
+
+.dark-theme .details-section-title {
+  color: #f1f5f9;
+  border-bottom-color: #334155;
+}
+
+.dark-theme .details-description {
+  color: #94a3b8;
+}
+
+.dark-theme .detail-info-block {
+  background: #0f172a;
+  border-color: #334155;
+}
+
+.dark-theme .detail-info-label {
+  color: #94a3b8;
+}
+
+.dark-theme .detail-info-value {
+  color: #f1f5f9;
+}
+
+/* ── Empty states ────────────────────────────────────────── */
+.dark-theme .empty-state-container {
+  background: #1e293b;
+  border-color: #475569;
+}
+
+.dark-theme .empty-state-title {
+  color: #e2e8f0;
+}
+
+.dark-theme .empty-state-subtitle {
+  color: #94a3b8;
+}
+
+/* ── SLDS input/textarea overrides for dark mode ─────────── */
+.dark-theme lightning-input,
+.dark-theme lightning-textarea,
+.dark-theme lightning-combobox {
+  --sds-c-input-color-background: #0f172a;
+  --sds-c-input-color-border: #475569;
+  --sds-c-input-text-color: #e2e8f0;
+  --sds-c-textarea-color-background: #0f172a;
+  --sds-c-textarea-color-border: #475569;
+  --sds-c-textarea-text-color: #e2e8f0;
+  --sds-c-combobox-color-background: #0f172a;
+  --sds-c-combobox-color-border: #475569;
+  --sds-c-combobox-text-color: #e2e8f0;
+}
+
+/* ── Backdrop ────────────────────────────────────────────── */
+.dark-theme .custom-backdrop {
+  background-color: rgba(2, 6, 23, 0.75) !important;
+}
+
+/* ── Sync button inside dark header (already inherits white) */
+.dark-theme .sync-button {
+  --sds-c-button-neutral-color-background: rgba(255, 255, 255, 0.12);
+  --sds-c-button-neutral-color-text: #fff;
+  --sds-c-button-neutral-color-border: rgba(255, 255, 255, 0.25);
+  --sds-c-button-neutral-color-background-hover: rgba(255, 255, 255, 0.22);
+}
+
+/* ── General text colours ────────────────────────────────── */
+.dark-theme .slds-text-color_weak,
+.dark-theme .slds-text-body_small,
+.dark-theme .slds-text-body_regular {
+  color: #94a3b8 !important;
+}
+
+.dark-theme strong {
+  color: #e2e8f0;
+}
+
+/* ── Pagination button neutral overrides ─────────────────── */
+.dark-theme lightning-button {
+  --sds-c-button-neutral-color-background: #1e293b;
+  --sds-c-button-neutral-color-text: #e2e8f0;
+  --sds-c-button-neutral-color-border: #475569;
+  --sds-c-button-neutral-color-background-hover: #334155;
+}

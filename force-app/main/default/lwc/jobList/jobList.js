@@ -39,8 +39,58 @@ export default class JobList extends LightningElement {
   displayMetrics = [];
   animationComplete = false;
 
+  // Dark mode state
+  isDarkMode = false;
+
   connectedCallback() {
+    // Restore saved theme from localStorage
+    const savedTheme = localStorage.getItem("jobPortalTheme");
+    this.isDarkMode = savedTheme === "dark";
     this.fetchApplications();
+  }
+
+  renderedCallback() {
+    // Apply theme class to host wrapper after every render
+    const wrapper = this.template.querySelector(".theme-wrapper");
+    if (wrapper) {
+      if (this.isDarkMode) {
+        wrapper.classList.add("dark-theme");
+        wrapper.classList.remove("light-theme");
+      } else {
+        wrapper.classList.add("light-theme");
+        wrapper.classList.remove("dark-theme");
+      }
+    }
+  }
+
+  handleThemeToggle() {
+    this.isDarkMode = !this.isDarkMode;
+    localStorage.setItem("jobPortalTheme", this.isDarkMode ? "dark" : "light");
+    // Re-apply class immediately
+    const wrapper = this.template.querySelector(".theme-wrapper");
+    if (wrapper) {
+      if (this.isDarkMode) {
+        wrapper.classList.add("dark-theme");
+        wrapper.classList.remove("light-theme");
+      } else {
+        wrapper.classList.add("light-theme");
+        wrapper.classList.remove("dark-theme");
+      }
+    }
+  }
+
+  get themeToggleIcon() {
+    return this.isDarkMode ? "utility:daylight" : "utility:richtextindent";
+  }
+
+  get themeToggleLabel() {
+    return this.isDarkMode ? "Light Mode" : "Dark Mode";
+  }
+
+  get themeWrapperClass() {
+    return this.isDarkMode
+      ? "theme-wrapper dark-theme"
+      : "theme-wrapper light-theme";
   }
 
   // Retrieve submitted applications securely via Apex
