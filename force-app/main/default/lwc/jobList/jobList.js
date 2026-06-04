@@ -27,6 +27,7 @@ export default class JobList extends LightningElement {
   searchTerm = "";
   selectedJobType = "";
   selectedLocation = "";
+  selectedExperience = "";
   sortBy = "createdDate";
   sortOrder = "desc";
 
@@ -183,6 +184,16 @@ export default class JobList extends LightningElement {
       });
     }
     return options;
+  }
+
+  get experienceLevels() {
+    return [
+      { label: "All Experience Levels", value: "" },
+      { label: "Fresher", value: "Fresher" },
+      { label: "1-3 Years", value: "1-3 Years" },
+      { label: "3-5 Years", value: "3-5 Years" },
+      { label: "5+ Years", value: "5+ Years" }
+    ];
   }
 
   get sortOptions() {
@@ -389,6 +400,12 @@ export default class JobList extends LightningElement {
       }
     }
 
+    if (this.selectedExperience) {
+      filtered = filtered.filter(
+        (job) => job.Experience_Level__c === this.selectedExperience
+      );
+    }
+
     const [sortField, sortDirection] = this.sortValue.split("_");
     filtered.sort((a, b) => {
       let aValue;
@@ -439,6 +456,12 @@ export default class JobList extends LightningElement {
 
   handleLocationChange(event) {
     this.selectedLocation = event.target.value;
+    this.currentPage = 1;
+    this.applyFiltersAndSort();
+  }
+
+  handleExperienceChange(event) {
+    this.selectedExperience = event.target.value;
     this.currentPage = 1;
     this.applyFiltersAndSort();
   }

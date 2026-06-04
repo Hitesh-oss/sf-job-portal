@@ -11,6 +11,7 @@ public with sharing class JobPortalController {
         Location__c,
         Job_Type__c,
         Salary_Range__c,
+        Experience_Level__c,
         Description__c,
         Required_Skills__c,
         Posted_Date__c,

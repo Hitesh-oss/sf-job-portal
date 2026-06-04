@@ -123,6 +123,16 @@
             </lightning-combobox>
 
             <lightning-combobox
+              label="Experience Level"
+              placeholder="All Experience Levels"
+              options={experienceLevels}
+              value={selectedExperience}
+              onchange={handleExperienceChange}
+              class="slds-m-top_medium"
+            >
+            </lightning-combobox>
+
+            <lightning-combobox
               label="Sort By"
               options={sortOptions}
               value={sortValue}
@@ -303,6 +313,11 @@
                           <span class="job-meta-item"
                             >{job.Salary_Range__c}</span
                           >
+                          <template if:true={job.Experience_Level__c}>
+                            <span class="job-meta-item"
+                              >{job.Experience_Level__c}</span
+                            >
+                          </template>
                           <span class="job-meta-item">{job.relativeTime}</span>
                         </div>
                         <template if:true={job.Description__c}>
@@ -518,7 +533,7 @@
                   class="slds-grid slds-wrap slds-gutters slds-m-bottom_large"
                 >
                   <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small"
                   >
                     <div class="detail-info-block">
                       <span class="detail-info-label">Job Type</span>
@@ -528,7 +543,7 @@
                     </div>
                   </div>
                   <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small"
                   >
                     <div class="detail-info-block">
                       <span class="detail-info-label">Salary Range</span>
@@ -538,7 +553,17 @@
                     </div>
                   </div>
                   <div
-                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small"
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small"
+                  >
+                    <div class="detail-info-block">
+                      <span class="detail-info-label">Experience</span>
+                      <span class="detail-info-value"
+                        >{selectedJob.Experience_Level__c}</span
+                      >
+                    </div>
+                  </div>
+                  <div
+                    class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small"
                   >
                     <div class="detail-info-block">
                       <span class="detail-info-label">Posted Date</span>
