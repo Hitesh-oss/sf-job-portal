@@ -4,19 +4,25 @@
       <!-- Advanced Header Section -->
       <div class="advanced-header slds-p-around_medium">
         <div class="header-top slds-m-bottom_medium">
-          <div class="slds-grid slds-grid_align-spread slds-align-middle">
-            <div class="header-content">
+          <div
+            class="slds-grid slds-grid_align-spread slds-align-middle slds-wrap"
+          >
+            <div
+              class="header-content slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-m-bottom_medium slds-medium-m-bottom_none"
+            >
               <h1 class="header-title">Find Your Perfect Job</h1>
-              <p class="header-subtitle">
+              <p class="header-subtitle slds-m-top_xx-small">
                 Explore thousands of opportunities tailored to your skills
               </p>
-              <div class="header-badges slds-m-top_small">
+              <div class="header-badges slds-m-top_medium">
                 <span class="badge badge-primary">🔥 Trending</span>
                 <span class="badge badge-success">✓ Verified</span>
                 <span class="badge badge-info">📍 Live Openings</span>
               </div>
             </div>
-            <div class="header-stats slds-grid slds-align-middle">
+            <div
+              class="header-stats slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-grid slds-grid_align-end slds-align-middle"
+            >
               <lightning-button-icon
                 icon-name={themeToggleIcon}
                 variant="border-filled"
@@ -27,7 +33,7 @@
               >
               </lightning-button-icon>
               <lightning-button-icon
-                icon-name="utility:sync"
+                icon-name="utility:refresh"
                 variant="border-filled"
                 tooltip="Sync Jobs"
                 alternative-text="Sync Jobs"
