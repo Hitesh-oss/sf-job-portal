@@ -21,7 +21,7 @@ public with sharing class JobPortalController {
         Source__c,
         CreatedDate
       FROM Job__c
-      WHERE Status__c = 'Active,'
+      WHERE Status__c = 'Active'
       WITH SYSTEM_MODE
       ORDER BY Posted_Date__c DESC NULLS LAST
     ];
