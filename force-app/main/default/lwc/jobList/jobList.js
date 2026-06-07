@@ -81,7 +81,7 @@ export default class JobList extends LightningElement {
   }
 
   get themeToggleIcon() {
-    return this.isDarkMode ? "utility:sun" : "utility:moon";
+    return "utility:brightness";
   }
 
   get themeWrapperClass() {

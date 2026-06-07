@@ -870,13 +870,14 @@
 }
 
 .sync-button {
-  --sds-c-icon-button-color-background: #ffffff;
-  --sds-c-icon-color-foreground-default: #4f46e5;
-  --sds-c-icon-button-color-border: #ffffff;
-  --sds-c-icon-button-color-background-hover: #f8fafc;
-  --sds-c-icon-color-foreground-default-hover: #4338ca;
+  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.15);
+  --sds-c-icon-color-foreground-default: #ffffff;
+  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.35);
+  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.28);
+  --sds-c-icon-color-foreground-default-hover: #ffffff;
   --sds-c-icon-button-radius-border: 999px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -885,7 +886,7 @@
 
 .sync-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
 }
 
 /* ============================================================
