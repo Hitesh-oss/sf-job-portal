@@ -17,22 +17,24 @@
               </div>
             </div>
             <div class="header-stats slds-grid slds-align-middle">
-              <lightning-button
-                label={themeToggleLabel}
+              <lightning-button-icon
                 icon-name={themeToggleIcon}
-                variant="neutral"
+                variant="border-filled"
+                tooltip="Toggle Theme"
+                alternative-text="Toggle Theme"
                 onclick={handleThemeToggle}
                 class="theme-toggle-btn slds-m-right_small"
               >
-              </lightning-button>
-              <lightning-button
-                label="Sync Real Jobs"
+              </lightning-button-icon>
+              <lightning-button-icon
                 icon-name="utility:sync"
-                variant="neutral"
+                variant="border-filled"
+                tooltip="Sync Jobs"
+                alternative-text="Sync Jobs"
                 onclick={handleSyncJobs}
                 class="sync-button slds-m-right_medium"
               >
-              </lightning-button>
+              </lightning-button-icon>
               <div class="stat-box">
                 <span class="stat-number">{filteredJobs.length}</span>
                 <span class="stat-label">Active Jobs</span>

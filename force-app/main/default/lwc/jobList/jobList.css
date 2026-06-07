@@ -874,13 +874,12 @@
 }
 
 .sync-button {
-  --sds-c-button-neutral-color-background: #ffffff;
-  --sds-c-button-neutral-color-text: #4f46e5;
-  --sds-c-button-neutral-color-border: #ffffff;
-  --sds-c-button-neutral-color-background-hover: #f8fafc;
-  --sds-c-button-neutral-color-text-hover: #4338ca;
-  --sds-c-button-neutral-radius-border: 999px;
-  font-weight: 700;
+  --sds-c-icon-button-color-background: #ffffff;
+  --sds-c-icon-color-foreground-default: #4f46e5;
+  --sds-c-icon-button-color-border: #ffffff;
+  --sds-c-icon-button-color-background-hover: #f8fafc;
+  --sds-c-icon-color-foreground-default-hover: #4338ca;
+  --sds-c-icon-button-radius-border: 999px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition:
     transform 0.2s ease,
@@ -905,13 +904,12 @@
 }
 
 .theme-toggle-btn {
-  --sds-c-button-neutral-color-background: rgba(255, 255, 255, 0.15);
-  --sds-c-button-neutral-color-text: #fff;
-  --sds-c-button-neutral-color-border: rgba(255, 255, 255, 0.35);
-  --sds-c-button-neutral-color-background-hover: rgba(255, 255, 255, 0.28);
-  --sds-c-button-neutral-color-text-hover: #fff;
-  --sds-c-button-neutral-radius-border: 999px;
-  font-weight: 700;
+  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.15);
+  --sds-c-icon-color-foreground-default: #ffffff;
+  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.35);
+  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.28);
+  --sds-c-icon-color-foreground-default-hover: #ffffff;
+  --sds-c-icon-button-radius-border: 999px;
   backdrop-filter: blur(8px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   transition:
@@ -1219,10 +1217,10 @@
 
 /* ── Sync button inside dark header (already inherits white) */
 .dark-theme .sync-button {
-  --sds-c-button-neutral-color-background: rgba(255, 255, 255, 0.12);
-  --sds-c-button-neutral-color-text: #fff;
-  --sds-c-button-neutral-color-border: rgba(255, 255, 255, 0.25);
-  --sds-c-button-neutral-color-background-hover: rgba(255, 255, 255, 0.22);
+  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.12);
+  --sds-c-icon-color-foreground-default: #ffffff;
+  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.25);
+  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.22);
 }
 
 /* ── General text colours ────────────────────────────────── */
