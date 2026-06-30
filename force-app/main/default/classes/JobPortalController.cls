@@ -1,30 +1,43 @@
 public with sharing class JobPortalController {
   // ── Get all cached Salesforce Job__c records ─────────────
   @AuraEnabled(cacheable=true)
-  public static List<Job__c> getAllJobs() {
-    return [
-      SELECT
-        Id,
-        Name,
-        Job_Title__c,
-        Company__c,
-        Location__c,
-        Job_Type__c,
-        Salary_Range__c,
-        Experience_Level__c,
-        Description__c,
-        Required_Skills__c,
-        Posted_Date__c,
-        Status__c,
-        Apply_URL__c,
-        External_Job_Id__c,
-        Source__c,
-        CreatedDate
-      FROM Job__c
-      WHERE Status__c = 'Active,'
-      WITH SYSTEM_MODE
-      ORDER BY Posted_Date__c DESC NULLS LAST
-    ];
+  public static List<Job__c> getJobs(
+    String query,
+    String location,
+    String type
+  ) {
+    String queryString =
+      'SELECT Id, Name, Job_Title__c, Company__c, Location__c, Job_Type__c, ' +
+      'Salary_Range__c, Experience_Level__c, Description__c, Required_Skills__c, ' +
+      'Posted_Date__c, Status__c, Apply_URL__c, External_Job_Id__c, Source__c, CreatedDate ' +
+      'FROM Job__c WHERE Status__c = \'Active,\'';
+
+    if (String.isNotBlank(query)) {
+      String likeQuery = '\'%' + String.escapeSingleQuotes(query) + '%\'';
+      queryString +=
+        ' AND (Job_Title__c LIKE ' +
+        likeQuery +
+        ' OR Company__c LIKE ' +
+        likeQuery +
+        ' OR Required_Skills__c LIKE ' +
+        likeQuery +
+        ' OR Description__c LIKE ' +
+        likeQuery +
+        ')';
+    }
+
+    if (String.isNotBlank(location) && location != 'All Locations') {
+      String likeLoc = '\'%' + String.escapeSingleQuotes(location) + '%\'';
+      queryString += ' AND Location__c LIKE ' + likeLoc;
+    }
+
+    if (String.isNotBlank(type) && type != 'All Types') {
+      String likeType = '\'%' + String.escapeSingleQuotes(type) + '%\'';
+      queryString += ' AND Job_Type__c LIKE ' + likeType;
+    }
+
+    queryString += ' ORDER BY Posted_Date__c DESC NULLS LAST LIMIT 200';
+    return Database.query(queryString);
   }
 
   // ── Create Application (accepts real-time job JSON) ───────

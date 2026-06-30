@@ -29,7 +29,7 @@ public class JobPortalControllerTest {
   @isTest
   static void testGetAllJobs() {
     Test.startTest();
-    List<Job__c> jobs = JobPortalController.getAllJobs();
+    List<Job__c> jobs = JobPortalController.getJobs(null, null, null);
     Test.stopTest();
 
     System.assertNotEquals(

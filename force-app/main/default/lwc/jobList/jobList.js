@@ -1,6 +1,7 @@
 import { LightningElement } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import getJobs from "@salesforce/apex/JobController.getJobs";
+import getJobs from "@salesforce/apex/JobPortalController.getJobs";
+import syncJobs from "@salesforce/apex/JobPortalController.syncJobs";
 import createApplication from "@salesforce/apex/JobPortalController.createApplication";
 import getMyApplications from "@salesforce/apex/JobPortalController.getMyApplications";
 
@@ -152,24 +153,27 @@ export default class JobList extends LightningElement {
           return;
         }
 
-        this.jobs = result.map((job) => ({
-          Id: job.id,
-          Job_Title__c: job.jobTitle,
-          Company__c: job.companyName,
-          Location__c: job.location,
-          Job_Type__c: job.jobType,
-          Salary_Range__c: job.salary,
-          Description__c: job.description,
-          Required_Skills__c: job.requiredSkills || "",
-          Posted_Date__c: job.postedDate,
-          Apply_URL__c: job.applyLink,
-          relativeTime: this.getRelativeTime(job.postedDate) || "Today",
-          isNew: job.isNew,
-          skillTags:
-            job.requiredSkills && job.requiredSkills !== "N/A"
-              ? job.requiredSkills.split(",").map((s) => s.trim())
-              : []
-        }));
+        this.jobs = result.map((job) => {
+          const relTime = this.getRelativeTime(job.Posted_Date__c) || "Today";
+          return {
+            Id: job.Id,
+            Job_Title__c: job.Job_Title__c,
+            Company__c: job.Company__c,
+            Location__c: job.Location__c,
+            Job_Type__c: job.Job_Type__c,
+            Salary_Range__c: job.Salary_Range__c,
+            Description__c: job.Description__c,
+            Required_Skills__c: job.Required_Skills__c || "",
+            Posted_Date__c: job.Posted_Date__c,
+            Apply_URL__c: job.Apply_URL__c,
+            relativeTime: relTime,
+            isNew: relTime === "Today" || relTime === "Yesterday",
+            skillTags:
+              job.Required_Skills__c && job.Required_Skills__c !== "N/A"
+                ? job.Required_Skills__c.split(",").map((s) => s.trim())
+                : []
+          };
+        });
 
         this.error = undefined;
         this.applyFiltersAndSort();
@@ -645,15 +649,35 @@ export default class JobList extends LightningElement {
   }
 
   // ── Sync / Refresh ────────────────────────────────────────
-  handleSyncJobs() {
-    this.loadJobs();
+  async handleSyncJobs() {
     this.dispatchEvent(
       new ShowToastEvent({
-        title: "Refreshing",
-        message: "Fetching latest real-time job listings...",
+        title: "Syncing",
+        message: "Fetching latest real-time jobs from API...",
         variant: "info"
       })
     );
+    this.isLoading = true;
+    try {
+      await syncJobs();
+      this.dispatchEvent(
+        new ShowToastEvent({
+          title: "Success",
+          message: "Real jobs synchronized successfully.",
+          variant: "success"
+        })
+      );
+      this.loadJobs();
+    } catch (err) {
+      this.dispatchEvent(
+        new ShowToastEvent({
+          title: "Sync Error",
+          message: err?.body?.message || err?.message || "Failed to sync jobs.",
+          variant: "error"
+        })
+      );
+      this.isLoading = false;
+    }
   }
 
   handleJobClick(event) {
