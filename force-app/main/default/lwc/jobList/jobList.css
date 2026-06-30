@@ -408,6 +408,22 @@
   background: linear-gradient(90deg, #4f46e5, #ec4899);
   border-radius: 999px;
   transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  width: var(--progress-width, 0%);
+}
+
+.activity-extra {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0.1rem 0 0.5rem;
+  font-style: italic;
+}
+
+.activity-percent {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-top: 0.25rem;
+  text-align: right;
 }
 
 /* Premium Modals & Forms Styling */
@@ -849,14 +865,13 @@
 }
 
 .sync-button {
-  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.15);
-  --sds-c-icon-color-foreground-default: #ffffff;
-  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.35);
-  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.28);
-  --sds-c-icon-color-foreground-default-hover: #ffffff;
+  --sds-c-icon-button-color-background: #f1f5f9;
+  --sds-c-icon-color-foreground-default: #4f46e5;
+  --sds-c-icon-button-color-border: #c7d2fe;
+  --sds-c-icon-button-color-background-hover: #e0e7ff;
+  --sds-c-icon-color-foreground-default-hover: #4338ca;
   --sds-c-icon-button-radius-border: 999px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -865,7 +880,7 @@
 
 .sync-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 /* ============================================================
@@ -880,14 +895,13 @@
 }
 
 .theme-toggle-btn {
-  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.15);
-  --sds-c-icon-color-foreground-default: #ffffff;
-  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.35);
-  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.28);
-  --sds-c-icon-color-foreground-default-hover: #ffffff;
+  --sds-c-icon-button-color-background: #f1f5f9;
+  --sds-c-icon-color-foreground-default: #4f46e5;
+  --sds-c-icon-button-color-border: #c7d2fe;
+  --sds-c-icon-button-color-background-hover: #e0e7ff;
+  --sds-c-icon-color-foreground-default-hover: #4338ca;
   --sds-c-icon-button-radius-border: 999px;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
@@ -896,7 +910,7 @@
 
 .theme-toggle-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
 }
 
 /* ============================================================
@@ -968,6 +982,18 @@
 
 .dark-theme .activity-value {
   color: #f1f5f9;
+}
+
+.dark-theme .activity-extra {
+  color: #64748b;
+}
+
+.dark-theme .activity-percent {
+  color: #64748b;
+}
+
+.dark-theme .progress-bar {
+  background: #334155;
 }
 
 /* ── Job summary sticky bar ──────────────────────────────── */
@@ -1191,12 +1217,36 @@
   background-color: rgba(2, 6, 23, 0.75) !important;
 }
 
-/* ── Sync button inside dark header (already inherits white) */
-.dark-theme .sync-button {
-  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.12);
-  --sds-c-icon-color-foreground-default: #ffffff;
-  --sds-c-icon-button-color-border: rgba(255, 255, 255, 0.25);
-  --sds-c-icon-button-color-background-hover: rgba(255, 255, 255, 0.22);
+/* ── Icon buttons inside dark mode ──────────────────────── */
+.dark-theme .sync-button,
+.dark-theme .theme-toggle-btn {
+  --sds-c-icon-button-color-background: rgba(255, 255, 255, 0.1);
+  --sds-c-icon-color-foreground-default: #a5b4fc;
+  --sds-c-icon-button-color-border: rgba(165, 180, 252, 0.3);
+  --sds-c-icon-button-color-background-hover: rgba(165, 180, 252, 0.2);
+  --sds-c-icon-color-foreground-default-hover: #c4b5fd;
+}
+
+/* ── Dark mode header text ───────────────────────────────── */
+.dark-theme .header-title {
+  color: #f1f5f9;
+}
+
+.dark-theme .header-subtitle {
+  color: #94a3b8;
+}
+
+.dark-theme .stat-box {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dark-theme .stat-number {
+  color: #f1f5f9;
+}
+
+.dark-theme .stat-label {
+  color: #94a3b8;
 }
 
 /* ── General text colours ────────────────────────────────── */

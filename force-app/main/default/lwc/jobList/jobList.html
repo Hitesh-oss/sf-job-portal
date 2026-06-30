@@ -197,18 +197,14 @@
                   <p class="slds-text-body_small slds-text-color_weak">
                     {metric.label}
                   </p>
-                  <p class="slds-text-body_small activity-extra">
-                    {metric.extra}
-                  </p>
+                  <p class="activity-extra">{metric.extra}</p>
                   <div class="progress-bar">
                     <div
                       class="progress-fill"
-                      data-percentage={metric.percentage}
+                      style={metric.progressStyle}
                     ></div>
                   </div>
-                  <p class="slds-text-body_small activity-percent">
-                    {metric.percentage}%
-                  </p>
+                  <p class="activity-percent">{metric.percentage}%</p>
                 </div>
               </template>
             </div>
