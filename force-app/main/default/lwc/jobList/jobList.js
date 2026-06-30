@@ -1,10 +1,8 @@
-import { LightningElement, wire } from "lwc";
+import { LightningElement } from "lwc";
 import { ShowToastEvent } from "lightning/platformShowToastEvent";
-import { refreshApex } from "@salesforce/apex";
-import getAllJobs from "@salesforce/apex/JobPortalController.getAllJobs";
+import getJobs from "@salesforce/apex/JobController.getJobs";
 import createApplication from "@salesforce/apex/JobPortalController.createApplication";
 import getMyApplications from "@salesforce/apex/JobPortalController.getMyApplications";
-import syncJobs from "@salesforce/apex/JobPortalController.syncJobs";
 
 export default class JobList extends LightningElement {
   jobs = [];
@@ -43,15 +41,17 @@ export default class JobList extends LightningElement {
   // Dark mode state
   isDarkMode = false;
 
+  // Debounce timer handle
+  searchTimeout;
+
   connectedCallback() {
-    // Restore saved theme from localStorage
     const savedTheme = localStorage.getItem("jobPortalTheme");
     this.isDarkMode = savedTheme === "dark";
     this.fetchApplications();
+    this.loadJobs();
   }
 
   renderedCallback() {
-    // Apply theme class to host wrapper after every render
     const wrapper = this.template.querySelector(".theme-wrapper");
     if (wrapper) {
       if (this.isDarkMode) {
@@ -64,10 +64,10 @@ export default class JobList extends LightningElement {
     }
   }
 
+  // ── Theme ────────────────────────────────────────────────
   handleThemeToggle() {
     this.isDarkMode = !this.isDarkMode;
     localStorage.setItem("jobPortalTheme", this.isDarkMode ? "dark" : "light");
-    // Re-apply class immediately
     const wrapper = this.template.querySelector(".theme-wrapper");
     if (wrapper) {
       if (this.isDarkMode) {
@@ -90,7 +90,7 @@ export default class JobList extends LightningElement {
       : "theme-wrapper light-theme";
   }
 
-  // Retrieve submitted applications securely via Apex
+  // ── Applications ─────────────────────────────────────────
   async fetchApplications() {
     try {
       const data = await getMyApplications();
@@ -126,17 +126,77 @@ export default class JobList extends LightningElement {
           });
         }
 
-        return {
-          ...app,
-          statusClass,
-          formattedDate
-        };
+        return { ...app, statusClass, formattedDate };
       });
     } catch (err) {
       console.error("Error fetching applications:", err);
     }
   }
 
+  // ── Real-time Job Loading ─────────────────────────────────
+  loadJobs() {
+    this.isLoading = true;
+    getJobs({
+      query: this.searchTerm || null,
+      location: this.selectedLocation || null,
+      type: this.selectedJobType || null
+    })
+      .then((result) => {
+        if (!result || result.length === 0) {
+          this.jobs = [];
+          this.filteredJobs = [];
+          this.totalPages = 1;
+          this.currentPage = 1;
+          this.animateMetrics();
+          this.error = undefined;
+          return;
+        }
+
+        this.jobs = result.map((job) => ({
+          Id: job.id,
+          Job_Title__c: job.jobTitle,
+          Company__c: job.companyName,
+          Location__c: job.location,
+          Job_Type__c: job.jobType,
+          Salary_Range__c: job.salary,
+          Description__c: job.description,
+          Required_Skills__c: job.requiredSkills || "",
+          Posted_Date__c: job.postedDate,
+          Apply_URL__c: job.applyLink,
+          relativeTime: this.getRelativeTime(job.postedDate) || "Today",
+          isNew: job.isNew,
+          skillTags:
+            job.requiredSkills && job.requiredSkills !== "N/A"
+              ? job.requiredSkills.split(",").map((s) => s.trim())
+              : []
+        }));
+
+        this.error = undefined;
+        this.applyFiltersAndSort();
+        this.animateMetrics();
+      })
+      .catch((err) => {
+        this.error = err;
+        this.jobs = [];
+        this.filteredJobs = [];
+        this.totalPages = 1;
+        this.currentPage = 1;
+        this.dispatchEvent(
+          new ShowToastEvent({
+            title: "API Error",
+            message:
+              err?.body?.message ||
+              "Failed to fetch real-time jobs. Please try again.",
+            variant: "error"
+          })
+        );
+      })
+      .finally(() => {
+        this.isLoading = false;
+      });
+  }
+
+  // ── Combobox Options ──────────────────────────────────────
   get jobTypes() {
     return [
       { label: "All Types", value: "" },
@@ -210,8 +270,10 @@ export default class JobList extends LightningElement {
     return this.jobs.slice(0, 3);
   }
 
+  // ── Dashboard Metrics ─────────────────────────────────────
   get activityMetrics() {
     if (!this.jobs || !Array.isArray(this.jobs)) return [];
+    const totalJobs = this.jobs.length;
     const newPostings = this.jobs.filter((job) => job.isNew).length;
     const companies = new Set(
       this.jobs.map((job) => job.Company__c).filter(Boolean)
@@ -219,33 +281,41 @@ export default class JobList extends LightningElement {
     const remoteRoles = this.jobs.filter((job) =>
       (job.Location__c || "").toLowerCase().includes("remote")
     ).length;
-    const maxJobs = this.jobs.length || 1;
+    const maxJobs = totalJobs || 1;
 
     return [
       {
+        label: "Active Jobs",
+        value: totalJobs,
+        extra: "Total live openings",
+        icon: "standard:record",
+        percentage: 100
+      },
+      {
+        label: "Remote Jobs",
+        value: remoteRoles,
+        extra: "Work from anywhere",
+        icon: "standard:home",
+        percentage: Math.round((remoteRoles / maxJobs) * 100)
+      },
+      {
         label: "New This Week",
         value: newPostings,
-        extra: "Fresh roles added recently",
-        icon: "standard:record",
+        extra: "Fresh roles added",
+        icon: "standard:reward",
         percentage: Math.round((newPostings / Math.max(maxJobs, 5)) * 100)
       },
       {
         label: "Active Companies",
         value: companies,
-        extra: "Hiring across companies",
+        extra: "Top hiring brands",
         icon: "standard:account",
         percentage: Math.round((companies / Math.max(maxJobs, 5)) * 100)
-      },
-      {
-        label: "Remote-Friendly",
-        value: remoteRoles,
-        extra: "Roles with remote options",
-        icon: "standard:home",
-        percentage: Math.round((remoteRoles / maxJobs) * 100)
       }
     ];
   }
 
+  // ── Pagination ────────────────────────────────────────────
   get paginatedJobs() {
     if (!this.filteredJobs || !Array.isArray(this.filteredJobs)) return [];
     const startIndex = (this.currentPage - 1) * this.pageSize;
@@ -269,6 +339,7 @@ export default class JobList extends LightningElement {
     return this.currentPage >= this.totalPages;
   }
 
+  // ── Tabs ──────────────────────────────────────────────────
   get isJobsTabActive() {
     return this.activeTab === "jobs";
   }
@@ -289,38 +360,7 @@ export default class JobList extends LightningElement {
       : "custom-tab-item";
   }
 
-  wiredJobsResult;
-
-  @wire(getAllJobs)
-  wiredJobs(result) {
-    this.wiredJobsResult = result;
-    const { error, data } = result;
-    this.isLoading = true;
-    if (data) {
-      const jobsWithMetadata = data.map((job) => {
-        const relativeTime = this.getRelativeTime(job.CreatedDate);
-        return {
-          ...job,
-          skillTags: job.Required_Skills__c
-            ? job.Required_Skills__c.split(",").map((s) => s.trim())
-            : [],
-          relativeTime,
-          isNew: relativeTime === "Today" || relativeTime === "Yesterday"
-        };
-      });
-      this.jobs = jobsWithMetadata;
-      this.error = undefined;
-      this.applyFiltersAndSort();
-      this.animateMetrics();
-    } else if (error) {
-      this.error = error;
-      this.jobs = [];
-      this.filteredJobs = [];
-      this.totalPages = 1;
-    }
-    this.isLoading = false;
-  }
-
+  // ── Metrics animation ─────────────────────────────────────
   animateMetrics() {
     const metrics = this.activityMetrics;
     this.displayMetrics = metrics.map((metric) => ({
@@ -330,6 +370,7 @@ export default class JobList extends LightningElement {
     this.animationComplete = true;
   }
 
+  // ── Salary parser ─────────────────────────────────────────
   parseSalary(salaryStr) {
     if (!salaryStr) return 0;
     const lower = salaryStr.toLowerCase();
@@ -341,60 +382,9 @@ export default class JobList extends LightningElement {
     return digits;
   }
 
+  // ── Filters & Sort (client-side for experience/sort) ─────
   applyFiltersAndSort() {
     let filtered = [...this.jobs];
-
-    if (this.searchTerm) {
-      const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (job) =>
-          (job.Job_Title__c || "").toLowerCase().includes(term) ||
-          (job.Company__c || "").toLowerCase().includes(term) ||
-          (job.Location__c || "").toLowerCase().includes(term) ||
-          (job.Description__c || "").toLowerCase().includes(term) ||
-          (job.Required_Skills__c || "").toLowerCase().includes(term)
-      );
-    }
-
-    if (this.selectedJobType) {
-      filtered = filtered.filter((job) => {
-        if (this.selectedJobType === "Remote") {
-          return (
-            (job.Job_Type__c || "").toLowerCase().includes("remote") ||
-            (job.Location__c || "").toLowerCase().includes("remote")
-          );
-        }
-        if (this.selectedJobType === "Contract") {
-          return (job.Job_Type__c || "").startsWith("Contract");
-        }
-        return job.Job_Type__c === this.selectedJobType;
-      });
-    }
-
-    if (this.selectedLocation) {
-      if (this.selectedLocation === "India") {
-        const indiaCities = [
-          "Bhubaneswar",
-          "Bengaluru",
-          "Hyderabad",
-          "Pune",
-          "Mumbai",
-          "Delhi",
-          "Noida",
-          "Gurgaon",
-          "Chennai",
-          "Kolkata",
-          "India"
-        ];
-        filtered = filtered.filter((job) =>
-          indiaCities.includes(job.Location__c)
-        );
-      } else {
-        filtered = filtered.filter(
-          (job) => job.Location__c === this.selectedLocation
-        );
-      }
-    }
 
     if (this.selectedExperience) {
       filtered = filtered.filter(
@@ -409,8 +399,8 @@ export default class JobList extends LightningElement {
 
       switch (sortField) {
         case "createdDate":
-          aValue = new Date(a.Posted_Date__c || a.CreatedDate).getTime();
-          bValue = new Date(b.Posted_Date__c || b.CreatedDate).getTime();
+          aValue = new Date(a.Posted_Date__c || "").getTime() || 0;
+          bValue = new Date(b.Posted_Date__c || "").getTime() || 0;
           break;
         case "salary":
           aValue = this.parseSalary(a.Salary_Range__c);
@@ -421,12 +411,8 @@ export default class JobList extends LightningElement {
           bValue = 0;
       }
 
-      if (aValue < bValue) {
-        return sortDirection === "desc" ? 1 : -1;
-      }
-      if (aValue > bValue) {
-        return sortDirection === "desc" ? -1 : 1;
-      }
+      if (aValue < bValue) return sortDirection === "desc" ? 1 : -1;
+      if (aValue > bValue) return sortDirection === "desc" ? -1 : 1;
       return 0;
     });
 
@@ -438,22 +424,27 @@ export default class JobList extends LightningElement {
     this.currentPage = Math.min(this.currentPage, this.totalPages);
   }
 
+  // ── Event Handlers ────────────────────────────────────────
   handleSearchChange(event) {
     this.searchTerm = event.target.value;
     this.currentPage = 1;
-    this.applyFiltersAndSort();
+    clearTimeout(this.searchTimeout);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.searchTimeout = setTimeout(() => {
+      this.loadJobs();
+    }, 500);
   }
 
   handleJobTypeChange(event) {
     this.selectedJobType = event.target.value;
     this.currentPage = 1;
-    this.applyFiltersAndSort();
+    this.loadJobs();
   }
 
   handleLocationChange(event) {
     this.selectedLocation = event.target.value;
     this.currentPage = 1;
-    this.applyFiltersAndSort();
+    this.loadJobs();
   }
 
   handleExperienceChange(event) {
@@ -482,7 +473,6 @@ export default class JobList extends LightningElement {
     }
   }
 
-  // Tab Selection Switcher
   handleTabChange(event) {
     event.preventDefault();
     this.activeTab = event.target.dataset.tab;
@@ -491,7 +481,6 @@ export default class JobList extends LightningElement {
     }
   }
 
-  // Modal view handlers for details and applications
   handleViewDetails(event) {
     this.selectedJobId = event.target.dataset.id;
     this.showDetailsModal = true;
@@ -545,9 +534,7 @@ export default class JobList extends LightningElement {
       'lightning-textarea[data-field="cover"]'
     );
 
-    if (!resumeInput || !coverInput) {
-      return false;
-    }
+    if (!resumeInput || !coverInput) return false;
 
     if (!this.resumeUrl || !this.resumeUrl.trim()) {
       resumeInput.setCustomValidity("Resume URL is required");
@@ -573,7 +560,6 @@ export default class JobList extends LightningElement {
 
     resumeInput.reportValidity();
     coverInput.reportValidity();
-
     return isValid;
   }
 
@@ -592,15 +578,9 @@ export default class JobList extends LightningElement {
     const date = new Date(dateString);
     const diff = Math.floor((now - date) / (1000 * 60 * 60 * 24));
 
-    if (diff === 0) {
-      return "Today";
-    }
-    if (diff === 1) {
-      return "Yesterday";
-    }
-    if (diff < 7) {
-      return `${diff} days ago`;
-    }
+    if (diff === 0) return "Today";
+    if (diff === 1) return "Yesterday";
+    if (diff < 7) return `${diff} days ago`;
     if (diff < 30) {
       const weeks = Math.floor(diff / 7);
       return `${weeks} week${weeks > 1 ? "s" : ""} ago`;
@@ -609,16 +589,31 @@ export default class JobList extends LightningElement {
     return `${months} month${months > 1 ? "s" : ""} ago`;
   }
 
+  // ── Submit Application ────────────────────────────────────
   async submitApplication() {
-    if (!this.validateForm()) {
-      return;
-    }
+    if (!this.validateForm()) return;
 
     this.isLoading = true;
 
     try {
+      const job = this.selectedJob;
+      if (!job) {
+        throw new Error("Selected job not found.");
+      }
+
+      const jobJson = JSON.stringify({
+        id: job.Id,
+        jobTitle: job.Job_Title__c,
+        companyName: job.Company__c,
+        location: job.Location__c,
+        jobType: job.Job_Type__c,
+        salary: job.Salary_Range__c,
+        description: job.Description__c,
+        applyLink: job.Apply_URL__c
+      });
+
       await createApplication({
-        jobId: this.selectedJobId,
+        jobJson,
         resumeUrl: this.resumeUrl.trim(),
         coverLetter: this.coverLetter.trim()
       });
@@ -626,8 +621,6 @@ export default class JobList extends LightningElement {
       this.showForm = false;
       this.resumeUrl = "";
       this.coverLetter = "";
-
-      // Instantly refresh application list dynamically on success
       await this.fetchApplications();
 
       this.dispatchEvent(
@@ -638,51 +631,28 @@ export default class JobList extends LightningElement {
         })
       );
     } catch (error) {
-      let message = "Failed to submit application. Please try again.";
-      if (error?.body?.message) {
-        message = error.body.message;
-      }
+      const message =
+        error?.body?.message ||
+        error?.message ||
+        "Failed to submit application. Please try again.";
       this.dispatchEvent(
-        new ShowToastEvent({
-          title: "Error",
-          message,
-          variant: "error"
-        })
+        new ShowToastEvent({ title: "Error", message, variant: "error" })
       );
     } finally {
       this.isLoading = false;
     }
   }
 
-  async handleSyncJobs() {
-    this.isLoading = true;
-    try {
-      await syncJobs();
-      this.dispatchEvent(
-        new ShowToastEvent({
-          title: "Success",
-          message: "Real jobs synchronized successfully!",
-          variant: "success"
-        })
-      );
-      await refreshApex(this.wiredJobsResult);
-    } catch (error) {
-      let message = "Failed to sync jobs.";
-      if (error?.body?.message) {
-        message = error.body.message;
-      } else if (error?.message) {
-        message = error.message;
-      }
-      this.dispatchEvent(
-        new ShowToastEvent({
-          title: "Error",
-          message,
-          variant: "error"
-        })
-      );
-    } finally {
-      this.isLoading = false;
-    }
+  // ── Sync / Refresh ────────────────────────────────────────
+  handleSyncJobs() {
+    this.loadJobs();
+    this.dispatchEvent(
+      new ShowToastEvent({
+        title: "Refreshing",
+        message: "Fetching latest real-time job listings...",
+        variant: "info"
+      })
+    );
   }
 
   handleJobClick(event) {

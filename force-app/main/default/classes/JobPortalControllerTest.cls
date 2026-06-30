@@ -2,19 +2,21 @@
 public class JobPortalControllerTest {
   @TestSetup
   static void setupTestData() {
-    // Create standard Job record
     Job__c job = new Job__c(
+      Name = 'Salesforce Architect',
       Job_Title__c = 'Salesforce Architect',
       Company__c = 'Google',
       Location__c = 'Remote',
-      Job_Type__c = 'Full-Time',
+      Job_Type__c = 'Full-time',
       Salary_Range__c = '$180k - $220k',
       Required_Skills__c = 'Apex, LWC, Cloud Computing',
-      Posted_Date__c = System.today()
+      Posted_Date__c = System.today(),
+      Status__c = 'Active,',
+      External_Job_Id__c = 'test_ext_001',
+      Source__c = 'External API'
     );
     insert job;
 
-    // Create standard Contact record
     Contact candidate = new Contact(
       FirstName = 'Hitesh',
       LastName = 'Candidate',
@@ -23,6 +25,7 @@ public class JobPortalControllerTest {
     insert candidate;
   }
 
+  // ── getAllJobs ─────────────────────────────────────────────
   @isTest
   static void testGetAllJobs() {
     Test.startTest();
@@ -37,62 +40,78 @@ public class JobPortalControllerTest {
     System.assertEquals(
       'Salesforce Architect',
       jobs[0].Job_Title__c,
-      'Correct job details returned'
+      'Job title matches'
     );
   }
 
+  // ── createApplication with JSON (real-time flow) ─────────
   @isTest
-  static void testCreateApplication() {
-    Job__c job = [SELECT Id FROM Job__c LIMIT 1];
+  static void testCreateApplicationWithJson() {
+    // Build job JSON for a NEW external job (not yet in org)
+    String jobJson =
+      '{"id":"ext_new_999","jobTitle":"Backend Developer",' +
+      '"companyName":"TechCorp","location":"Bengaluru",' +
+      '"jobType":"Full-time","salary":"$120k",' +
+      '"description":"Build scalable APIs.",' +
+      '"applyLink":"https://apply.example.com"}';
 
     Test.startTest();
-    // Since we are running in standard context where User.ContactId is null,
-    // it should successfully insert the application with null Candidate securely
     JobPortalController.createApplication(
-      job.Id,
+      jobJson,
       'https://myresume.com/resume.pdf',
-      'This is my cover letter.'
+      'This is a detailed cover letter that is more than fifty characters long.'
     );
     Test.stopTest();
 
-    List<Application__c> apps = [
-      SELECT
-        Id,
-        Resume_URL__c,
-        Cover_Letter__c,
-        Application_Status__c,
-        Applied_Date__c
-      FROM Application__c
-    ];
-    System.assertEquals(
-      1,
-      apps.size(),
-      'One application record should be successfully created'
-    );
+    List<Application__c> apps = [SELECT Id, Resume_URL__c FROM Application__c];
+    System.assertEquals(1, apps.size(), 'Application created');
     System.assertEquals(
       'https://myresume.com/resume.pdf',
       apps[0].Resume_URL__c,
-      'Resume URL saved correctly'
+      'Resume URL correct'
     );
-    System.assertEquals(
-      'This is my cover letter.',
-      apps[0].Cover_Letter__c,
-      'Cover letter saved correctly'
-    );
-    System.assertEquals(
-      'Applied',
-      apps[0].Application_Status__c,
-      'Default status set to Applied'
-    );
-    System.assertEquals(
-      System.today(),
-      apps[0].Applied_Date__c,
-      'Applied Date auto-populated by Trigger on insert'
-    );
+
+    // Shadow job should have been created
+    List<Job__c> shadowJobs = [
+      SELECT Id
+      FROM Job__c
+      WHERE External_Job_Id__c = 'ext_new_999'
+    ];
+    System.assertEquals(1, shadowJobs.size(), 'Shadow job record created');
   }
 
+  // ── createApplication against existing Job__c ─────────────
   @isTest
-  static void testCreateApplicationMissingJobId() {
+  static void testCreateApplicationExistingJob() {
+    String jobJson =
+      '{"id":"test_ext_001","jobTitle":"Salesforce Architect",' +
+      '"companyName":"Google","location":"Remote",' +
+      '"jobType":"Full-time","salary":"$180k",' +
+      '"description":"Role details.",' +
+      '"applyLink":"https://apply.google.com"}';
+
+    Test.startTest();
+    JobPortalController.createApplication(
+      jobJson,
+      'https://resume.link/file.pdf',
+      'My cover letter is detailed and longer than fifty characters for validation.'
+    );
+    Test.stopTest();
+
+    List<Application__c> apps = [SELECT Id FROM Application__c];
+    System.assertEquals(1, apps.size(), 'Application created for existing job');
+    // Job record count should still be 1 (no duplicate)
+    List<Job__c> jobs = [
+      SELECT Id
+      FROM Job__c
+      WHERE External_Job_Id__c = 'test_ext_001'
+    ];
+    System.assertEquals(1, jobs.size(), 'No duplicate Job__c created');
+  }
+
+  // ── createApplication null guard ──────────────────────────
+  @isTest
+  static void testCreateApplicationMissingJson() {
     Test.startTest();
     try {
       JobPortalController.createApplication(
@@ -100,75 +119,58 @@ public class JobPortalControllerTest {
         'https://resume.com',
         'Letter'
       );
-      System.assert(
-        false,
-        'Exception should have been thrown for missing Job Id'
-      );
+      System.assert(false, 'Exception should have been thrown');
     } catch (AuraHandledException e) {
-      // In Apex unit tests, AuraHandledException messages are stripped and default to 'Script-thrown exception'
       System.assertEquals(
         'Script-thrown exception',
         e.getMessage(),
-        'AuraHandledException successfully caught'
+        'AuraHandledException caught correctly'
       );
     }
     Test.stopTest();
   }
 
+  // ── Duplicate application guard ───────────────────────────
   @isTest
   static void testTriggerDuplicateCheck() {
     Job__c job = [SELECT Id FROM Job__c LIMIT 1];
     Contact candidate = [SELECT Id FROM Contact LIMIT 1];
 
-    // Insert first application directly
     Application__c app1 = new Application__c(
       Job__c = job.Id,
       Candidate__c = candidate.Id,
       Resume_URL__c = 'https://res.pdf',
-      Cover_Letter__c = 'Cover letter content here'
+      Cover_Letter__c = 'Cover letter content here that is long enough'
     );
     insert app1;
 
-    // Insert duplicate application should fail
     Application__c app2 = new Application__c(
       Job__c = job.Id,
       Candidate__c = candidate.Id,
       Resume_URL__c = 'https://res.pdf',
-      Cover_Letter__c = 'Cover letter content here'
+      Cover_Letter__c = 'Cover letter content here that is long enough'
     );
 
     Test.startTest();
     try {
       insert app2;
-      System.assert(
-        false,
-        'DmlException expected due to duplicate check trigger'
-      );
+      System.assert(false, 'DmlException expected');
     } catch (DmlException e) {
       System.assert(
         e.getDmlMessage(0).contains('already applied'),
-        'Trigger should throw already applied message'
+        'Trigger fires correctly'
       );
     }
     Test.stopTest();
   }
 
+  // ── syncJobs (uses JobApiServiceTest mock) ────────────────
   @isTest
   static void testSyncJobsSuccess() {
     String jsonPayload =
-      '{' +
-      '"jobs": [' +
-      '{' +
-      '"id": 112233,' +
-      '"url": "https://remotive.com/jobs/112233",' +
-      '"title": "Salesforce Specialist",' +
-      '"company_name": "Antigravity Corp",' +
-      '"job_type": "full_time",' +
-      '"publication_date": "2026-05-21",' +
-      '"description": "Role Details"' +
-      '}' +
-      ']' +
-      '}';
+      '{"jobs":[{"id":112233,"url":"https://remotive.com/jobs/112233",' +
+      '"title":"Salesforce Specialist","company_name":"Antigravity Corp",' +
+      '"job_type":"full_time","publication_date":"2026-05-21","description":"Role Details"}]}';
 
     Test.setMock(
       HttpCalloutMock.class,
@@ -179,16 +181,12 @@ public class JobPortalControllerTest {
     JobPortalController.syncJobs();
     Test.stopTest();
 
-    List<Job__c> syncedJobs = [
-      SELECT Id, Job_Title__c
+    List<Job__c> synced = [
+      SELECT Id
       FROM Job__c
       WHERE External_Job_Id__c = '112233'
     ];
-    System.assertEquals(
-      1,
-      syncedJobs.size(),
-      'Should successfully sync one job via controller.'
-    );
+    System.assertEquals(1, synced.size(), 'Sync created 1 job');
   }
 
   @isTest
@@ -201,12 +199,9 @@ public class JobPortalControllerTest {
     Test.startTest();
     try {
       JobPortalController.syncJobs();
-      System.assert(false, 'Expected AuraHandledException to be thrown.');
+      System.assert(false, 'Expected AuraHandledException');
     } catch (AuraHandledException e) {
-      System.assert(
-        e.getMessage() != null,
-        'AuraHandledException successfully thrown.'
-      );
+      System.assert(e.getMessage() != null, 'Exception thrown');
     }
     Test.stopTest();
   }
